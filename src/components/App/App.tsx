@@ -22,46 +22,62 @@ const Popup = (props: { feature: Feature }) => (
 
 class App extends React.Component<typeof queries.Props> {
   map: leaflet.Map;
+  tileLayer: leaflet.Layer;
+
+  initializeMap() {
+    // create map instance
+    this.map = leaflet.map("map", { preferCanvas: false });
+
+    // init map with mapbox tiles
+    this.tileLayer = leaflet.tileLayer(
+      "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
+      {
+        id: "mapbox.streets",
+        accessToken:
+          "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
+      } as any
+    );
+
+    this.map.addLayer(this.tileLayer);
+
+    navigator.geolocation.getCurrentPosition(position => {
+      this.map.setView(
+        leaflet.latLng(position.coords.latitude, position.coords.longitude),
+        12
+      );
+    });
+  }
+
+  updateMap() {
+    if (this.props.collection.ready) {
+      // create new layer
+      const layer = leaflet.geoJSON(this.props.collection.value, {
+        onEachFeature: (feature: Feature, layer: any) => {
+          layer.bindPopup(
+            ReactDOMServer.renderToString(<Popup feature={feature} />)
+          );
+        },
+        style: (feature: Feature) => ({
+          color: feature.properties.color
+        })
+      });
+
+      // replace previous layer with new one
+      this.map.eachLayer(layer => {
+        if (layer !== this.tileLayer) {
+          this.map.removeLayer(layer);
+        }
+      });
+      this.map.addLayer(layer);
+    }
+  }
 
   componentDidMount() {
-    this.map = leaflet.map("map");
+    this.initializeMap();
   }
 
   componentDidUpdate() {
-    if (this.props.collection.ready) {
-      const onEachFeature = (feature: Feature, layer: any) => {
-        layer.bindPopup(
-          ReactDOMServer.renderToString(<Popup feature={feature} />)
-        );
-      };
-
-      const style = (feature: Feature) => ({
-        color: feature.properties.color
-      });
-
-      // init map with mapbox tiles
-      leaflet
-        .tileLayer(
-          "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-          {
-            id: "mapbox.streets",
-            accessToken:
-              "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
-          } as any
-        )
-        .addTo(this.map);
-
-      // add geojson
-      const layer = leaflet
-        .geoJSON(this.props.collection.value, {
-          onEachFeature,
-          style
-        })
-        .addTo(this.map);
-
-      // update map size
-      this.map.fitBounds(layer.getBounds());
-    }
+    this.updateMap();
   }
 
   render() {
