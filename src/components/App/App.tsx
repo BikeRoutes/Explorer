@@ -1,24 +1,17 @@
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import { declareQueries } from "@buildo/bento/data";
-import { collection } from "queries";
+import { routes } from "queries";
 import { GeoJson } from "model";
 import * as leaflet from "leaflet";
+import Popup from "Popup/Popup";
 
 // import "leaflet/dist/leaflet.css";
 import "./app.scss";
 
-const queries = declareQueries({ collection });
+const queries = declareQueries({ routes });
 
 type Feature = GeoJson["features"][number];
-
-const Popup = (props: { feature: Feature }) => (
-  <div>
-    <div>Name: {props.feature.properties.name}</div>
-    <div>Length: {props.feature.properties.length} km</div>
-    <div>Elevation gain: {props.feature.properties.elevationGain} m</div>
-  </div>
-);
 
 class App extends React.Component<typeof queries.Props> {
   map: leaflet.Map;
@@ -49,26 +42,28 @@ class App extends React.Component<typeof queries.Props> {
   }
 
   updateMap() {
-    if (this.props.collection.ready) {
-      // create new layer
-      const layer = leaflet.geoJSON(this.props.collection.value, {
-        onEachFeature: (feature: Feature, layer: any) => {
-          layer.bindPopup(
-            ReactDOMServer.renderToString(<Popup feature={feature} />)
-          );
-        },
-        style: (feature: Feature) => ({
-          color: feature.properties.color
-        })
-      });
-
-      // replace previous layer with new one
+    if (this.props.routes.ready) {
+      // clear previous layers
       this.map.eachLayer(layer => {
         if (layer !== this.tileLayer) {
           this.map.removeLayer(layer);
         }
       });
-      this.map.addLayer(layer);
+
+      this.props.routes.value.map(route => {
+        const layer = leaflet.geoJSON(route, {
+          onEachFeature: (feature: Feature, layer: any) => {
+            layer.bindPopup(
+              ReactDOMServer.renderToString(<Popup feature={feature} />)
+            );
+          },
+          style: (feature: Feature) => ({
+            color: feature.properties.color
+          })
+        });
+
+        this.map.addLayer(layer);
+      });
     }
   }
 

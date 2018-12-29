@@ -19,7 +19,18 @@ export const getRoutes = (): Promise<GeoJson[]> => {
     .then(contents => {
       return Promise.all(
         contents.map(c =>
-          fetch(c.download_url).then(r => r.json() as Promise<GeoJson>)
+          fetch(c.download_url)
+            .then(r => r.json() as Promise<GeoJson>)
+            .then(route => ({
+              ...route,
+              features: route.features.map(f => ({
+                ...f,
+                properties: {
+                  ...f.properties,
+                  url: c.html_url
+                }
+              }))
+            }))
         )
       );
     });

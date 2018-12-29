@@ -27,6 +27,7 @@ export type Content = {
   type: "dir" | "file";
   url: string;
   download_url: string;
+  html_url: string;
 };
 
 export type GeoJson = {
@@ -38,6 +39,7 @@ export type GeoJson = {
       color: string;
       length: string;
       elevationGain: number;
+      url: string;
     };
     geometry: {
       type: "LineString";

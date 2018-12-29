@@ -30,7 +30,25 @@ export const currentView = Query({
 export const routes = Query({
   cacheStrategy: available,
   params: {},
-  fetch: () => API.getRoutes()
+  fetch: () =>
+    API.getRoutes().then((routes: GeoJson[]) =>
+      routes.map(route => {
+        return {
+          ...route,
+          features: route.features.map(f => ({
+            ...f,
+            properties: {
+              ...f.properties,
+              color: stringToColor(f.properties.name),
+              length: (geoJsonLength(f.geometry) / 1000).toFixed(1),
+              elevationGain: Math.round(
+                getElevationGain(f.geometry.coordinates)
+              )
+            }
+          }))
+        };
+      })
+    )
 });
 
 export const collection = Query({
@@ -46,19 +64,7 @@ export const collection = Query({
     const collection: GeoJson = routes.reduce(
       (acc, route) => ({
         ...acc,
-        features: acc.features.concat(
-          route.features.map(f => ({
-            ...f,
-            properties: {
-              ...f.properties,
-              color: stringToColor(f.properties.name),
-              length: (geoJsonLength(f.geometry) / 1000).toFixed(1),
-              elevationGain: Math.round(
-                getElevationGain(f.geometry.coordinates)
-              )
-            }
-          }))
-        )
+        features: acc.features.concat(route.features)
       }),
       emptyGeoJson
     );
