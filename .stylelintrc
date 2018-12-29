@@ -1,3 +1,6 @@
 {
-  "extends": "./node_modules/scriptoni/lib/scripts/stylelint/stylelintrc.json"
+  "extends": "./node_modules/scriptoni/lib/scripts/stylelint/stylelintrc.json",
+  "rules": {
+    "string-quotes": null
+  }
 }

@@ -1,4 +1,4 @@
-import { Query, location } from "@buildo/bento/data";
+import { Query, location, available } from "@buildo/bento/data";
 import * as API from "API";
 import { locationToView, GeoJson } from "model";
 import * as stringToColor from "string-to-color";
@@ -28,11 +28,13 @@ export const currentView = Query({
 });
 
 export const routes = Query({
+  cacheStrategy: available,
   params: {},
   fetch: () => API.getRoutes()
 });
 
 export const collection = Query({
+  cacheStrategy: available,
   dependencies: { routes },
   params: {},
   fetch: ({ routes }): Promise<GeoJson> => {
