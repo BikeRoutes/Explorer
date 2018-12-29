@@ -65,7 +65,7 @@ class App extends React.Component<typeof queries.Props> {
   }
 
   render() {
-    return <div id="map" style={{ height: "100%", width: "100%" }} />;
+    return <div id="map" />;
   }
 }
 
