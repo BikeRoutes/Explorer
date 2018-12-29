@@ -5,7 +5,7 @@ import { collection } from "queries";
 import { GeoJson } from "model";
 import * as leaflet from "leaflet";
 
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
 import "./app.scss";
 
 const queries = declareQueries({ collection });
