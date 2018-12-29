@@ -24,11 +24,9 @@ class App extends React.Component<typeof queries.Props> {
   componentDidUpdate() {
     if (this.props.collection.ready) {
       const onEachFeature = (feature: Feature, layer: any) => {
-        if (feature.properties) {
-          layer.bindPopup(
-            ReactDOMServer.renderToString(<Popup feature={feature} />)
-          );
-        }
+        layer.bindPopup(
+          ReactDOMServer.renderToString(<Popup feature={feature} />)
+        );
       };
 
       const style = (feature: Feature) => ({
@@ -36,6 +34,8 @@ class App extends React.Component<typeof queries.Props> {
       });
 
       const map = L.map("map");
+
+      // init map with mapbox tiles
       L.tileLayer(
         "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
         {
@@ -44,10 +44,14 @@ class App extends React.Component<typeof queries.Props> {
             "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
         }
       ).addTo(map);
+
+      // add geojson
       const layer = L.geoJson(this.props.collection.value, {
         onEachFeature,
         style
       }).addTo(map);
+
+      // update map size
       map.fitBounds(layer.getBounds());
     }
   }
