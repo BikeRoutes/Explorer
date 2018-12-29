@@ -3,10 +3,10 @@ import * as ReactDOMServer from "react-dom/server";
 import { declareQueries } from "@buildo/bento/data";
 import { collection } from "queries";
 import { GeoJson } from "model";
+import * as leaflet from "leaflet";
 
+import "leaflet/dist/leaflet.css";
 import "./app.scss";
-
-declare const L: any;
 
 const queries = declareQueries({ collection });
 
@@ -21,6 +21,12 @@ const Popup = (props: { feature: Feature }) => (
 );
 
 class App extends React.Component<typeof queries.Props> {
+  map: leaflet.Map;
+
+  componentDidMount() {
+    this.map = leaflet.map("map");
+  }
+
   componentDidUpdate() {
     if (this.props.collection.ready) {
       const onEachFeature = (feature: Feature, layer: any) => {
@@ -33,36 +39,32 @@ class App extends React.Component<typeof queries.Props> {
         color: feature.properties.color
       });
 
-      const map = L.map("map");
-
       // init map with mapbox tiles
-      L.tileLayer(
-        "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-        {
-          id: "mapbox.streets",
-          accessToken:
-            "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
-        }
-      ).addTo(map);
+      leaflet
+        .tileLayer(
+          "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
+          {
+            id: "mapbox.streets",
+            accessToken:
+              "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
+          } as any
+        )
+        .addTo(this.map);
 
       // add geojson
-      const layer = L.geoJson(this.props.collection.value, {
-        onEachFeature,
-        style
-      }).addTo(map);
+      const layer = leaflet
+        .geoJSON(this.props.collection.value, {
+          onEachFeature,
+          style
+        })
+        .addTo(this.map);
 
       // update map size
-      map.fitBounds(layer.getBounds());
+      this.map.fitBounds(layer.getBounds());
     }
   }
 
   render() {
-    const { collection } = this.props;
-
-    if (!collection.ready) {
-      return null;
-    }
-
     return <div id="map" style={{ height: "100%", width: "100%" }} />;
   }
 }
