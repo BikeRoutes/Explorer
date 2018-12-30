@@ -4,9 +4,7 @@
   "scripts": {
     "start": "bento web-dev -c ./config",
     "build": "NODE_ENV=production bento web-build -c ./config --paths ./paths.js --webpackConfig ./webpackConfig.js",
-    "lint": "bento lint",
-    "lint-fix": "bento lint --fix",
-    "lint-style": "bento lint-style",
+    "deploy": "yarn build && git add docs && git commit -m 'update github page' && git push",
     "prettier-check": "bento prettier-check",
     "prettier-write": "bento prettier-write"
   },
