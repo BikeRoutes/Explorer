@@ -16,6 +16,7 @@ type Props = {
   selectedRoute: Option<GeoJson>;
   hoveredRoute: Option<GeoJson>;
   onRouteHover: (route: Option<GeoJson>) => void;
+  onRouteSelect: (route: GeoJson) => void;
 };
 
 class App extends React.PureComponent<Props> {
@@ -72,10 +73,13 @@ class App extends React.PureComponent<Props> {
       });
     });
 
-    this.markers = this.layers.map(layer => {
-      const route = (layer.toGeoJSON() as any) as GeoJson;
+    this.markers = this.props.routes.map(route => {
       const coordinates = route.features[0].geometry.coordinates[0];
-      return leaflet.marker([coordinates[1], coordinates[0]], {});
+      return leaflet
+        .marker([coordinates[1], coordinates[0]])
+        .on("click", () => {
+          this.props.onRouteSelect(route);
+        });
     });
 
     this.layers.forEach(layer => this.map.addLayer(layer));

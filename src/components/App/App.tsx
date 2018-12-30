@@ -55,6 +55,7 @@ class App extends React.Component<Props, State> {
           selectedRoute={this.state.selectedRoute}
           hoveredRoute={this.state.hoveredRoute}
           onRouteHover={this.onRouteHover}
+          onRouteSelect={this.onRouteSelect}
         />
       </View>
     );
