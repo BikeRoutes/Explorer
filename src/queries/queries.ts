@@ -1,6 +1,6 @@
 import { Query, location, available } from "@buildo/bento/data";
 import * as API from "API";
-import { locationToView, GeoJson } from "model";
+import { locationToView, GeoJson, Feature } from "model";
 import * as stringToColor from "string-to-color";
 import * as geoJsonLength from "geojson-length";
 
@@ -30,45 +30,28 @@ export const currentView = Query({
 export const routes = Query({
   cacheStrategy: available,
   params: {},
-  fetch: () =>
+  fetch: (): Promise<GeoJson[]> =>
     API.getRoutes().then((routes: GeoJson[]) =>
       routes.map(route => {
-        return {
-          ...route,
-          features: route.features.map(f => ({
-            ...f,
-            properties: {
-              ...f.properties,
-              color: stringToColor(f.properties.name),
-              length: (geoJsonLength(f.geometry) / 1000).toFixed(1),
-              elevationGain: Math.round(
-                getElevationGain(f.geometry.coordinates)
-              )
-            }
-          }))
+        const feature = route.features[0];
+        const richFeature: Feature = {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            color: stringToColor(feature.properties.name),
+            length: (geoJsonLength(feature.geometry) / 1000).toFixed(1),
+            elevationGain: Math.round(
+              getElevationGain(feature.geometry.coordinates)
+            )
+          }
         };
+
+        const geoJson: GeoJson = {
+          ...route,
+          features: [richFeature]
+        };
+
+        return geoJson;
       })
     )
-});
-
-export const collection = Query({
-  cacheStrategy: available,
-  dependencies: { routes },
-  params: {},
-  fetch: ({ routes }): Promise<GeoJson> => {
-    const emptyGeoJson: GeoJson = {
-      type: "FeatureCollection",
-      features: []
-    };
-
-    const collection: GeoJson = routes.reduce(
-      (acc, route) => ({
-        ...acc,
-        features: acc.features.concat(route.features)
-      }),
-      emptyGeoJson
-    );
-
-    return Promise.resolve(collection);
-  }
 });

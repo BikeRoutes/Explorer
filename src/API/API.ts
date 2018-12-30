@@ -21,16 +21,23 @@ export const getRoutes = (): Promise<GeoJson[]> => {
         contents.map(c =>
           fetch(c.download_url)
             .then(r => r.json() as Promise<GeoJson>)
-            .then(route => ({
-              ...route,
-              features: route.features.map(f => ({
-                ...f,
-                properties: {
-                  ...f.properties,
-                  url: c.html_url
-                }
-              }))
-            }))
+            .then(route => {
+              const feature = route.features[0];
+              const geoJson: GeoJson = {
+                ...route,
+                features: [
+                  {
+                    ...feature,
+                    properties: {
+                      ...feature.properties,
+                      url: c.html_url
+                    }
+                  }
+                ]
+              };
+
+              return geoJson;
+            })
         )
       );
     });

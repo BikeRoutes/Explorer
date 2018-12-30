@@ -1,0 +1,52 @@
+.side-bar {
+  width: 280px;
+  padding: 16px 0;
+  background: #fff;
+
+  h2 {
+    margin: 0;
+    padding: 0 26px;
+    margin-bottom: 8px;
+  }
+
+  .route {
+    border-bottom: 1px solid #eaeaea;
+    padding: 16px 26px;
+    cursor: pointer;
+
+    &:hover,
+    &.is-selected {
+      background: #f5f5f5;
+    }
+
+    .name {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .distance,
+    .elevation {
+      label {
+        color: #666;
+        width: 60px;
+        font-size: 13px;
+        font-weight: 400;
+      }
+
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .actions {
+      a {
+        margin-top: 8px;
+        color: lighten($color: #0000ff, $amount: 25%);
+
+        &:hover {
+          color: lighten($color: #0000ff, $amount: 15%);
+        }
+      }
+    }
+  }
+}

@@ -30,20 +30,22 @@ export type Content = {
   html_url: string;
 };
 
+export type Feature = {
+  type: "Feature";
+  properties: {
+    name: string;
+    color: string;
+    length: string;
+    elevationGain: number;
+    url: string;
+  };
+  geometry: {
+    type: "LineString";
+    coordinates: Array<[number, number, number]>;
+  };
+};
+
 export type GeoJson = {
   type: "FeatureCollection";
-  features: Array<{
-    type: "Feature";
-    properties: {
-      name: string;
-      color: string;
-      length: string;
-      elevationGain: number;
-      url: string;
-    };
-    geometry: {
-      type: "LineString";
-      coordinates: Array<[number, number, number]>;
-    };
-  }>;
+  features: [Feature];
 };

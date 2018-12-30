@@ -1,127 +1,63 @@
 import * as React from "react";
-import * as ReactDOMServer from "react-dom/server";
-import throttle = require("lodash/throttle");
 import { declareQueries } from "@buildo/bento/data";
 import { routes } from "queries";
+import View from "View";
+import Map from "Map/Map";
+import SideBar from "SideBar/SideBar";
 import { GeoJson } from "model";
-import * as leaflet from "leaflet";
-import Popup from "Popup/Popup";
-
-// import "leaflet/dist/leaflet.css";
-import "./app.scss";
+import { Option, none, some } from "fp-ts/lib/Option";
 
 const queries = declareQueries({ routes });
 
-type Feature = GeoJson["features"][number];
+type Props = typeof queries.Props;
 
-class App extends React.Component<typeof queries.Props> {
-  map: leaflet.Map;
-  tileLayer: leaflet.Layer;
-  popup = leaflet.popup({
-    closeButton: false
-  });
+type State = {
+  selectedRoute: Option<GeoJson>;
+  hoveredRoute: Option<GeoJson>;
+};
 
-  initializeMap() {
-    // create map instance
-    this.map = leaflet.map("map", { preferCanvas: false });
+class App extends React.Component<Props, State> {
+  state: State = {
+    selectedRoute: none,
+    hoveredRoute: none
+  };
 
-    // init map with mapbox tiles
-    this.tileLayer = leaflet.tileLayer(
-      "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-      {
-        id: "mapbox.streets",
-        accessToken:
-          "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
-      } as any
-    );
-
-    this.map.addLayer(this.tileLayer);
-
-    navigator.geolocation.getCurrentPosition(position => {
-      this.map.setView(
-        leaflet.latLng(position.coords.latitude, position.coords.longitude),
-        12
-      );
+  onRouteSelect = (route: GeoJson) => {
+    this.setState({
+      selectedRoute:
+        this.state.selectedRoute.isSome() &&
+        this.state.selectedRoute.value === route
+          ? none
+          : some(route)
     });
-  }
+  };
 
-  updateMap() {
-    if (this.props.routes.ready) {
-      // clear previous layers
-      this.map.eachLayer(layer => {
-        if (layer !== this.tileLayer) {
-          this.map.removeLayer(layer);
-        }
-      });
-
-      this.props.routes.value.map(route => {
-        const layer = leaflet.geoJSON(route, {
-          style: (feature: Feature) => ({
-            color: feature.properties.color
-          })
-        });
-
-        this.map.addLayer(layer);
-      });
-    }
-
-    this.map.on("mousemove", this.onMouseMove);
-  }
-
-  onMouseMove = throttle((e: leaflet.LeafletMouseEvent) => {
-    if (this.props.routes.ready) {
-      type ClosestRoute = {
-        distance: number;
-        point: leaflet.LatLng;
-        route: GeoJson;
-      };
-
-      const closestRoute: ClosestRoute = this.props.routes.value.reduce(
-        (acc, route) => {
-          const closestPoint: ClosestRoute = route.features[0].geometry.coordinates.reduce(
-            (acc, coordinates) => {
-              const point = leaflet.latLng(coordinates[1], coordinates[0]);
-              const distance = this.map
-                .latLngToContainerPoint(
-                  leaflet.latLng(coordinates[1], coordinates[0])
-                )
-                .distanceTo(this.map.latLngToContainerPoint(e.latlng));
-
-              return distance < acc.distance ? { distance, point, route } : acc;
-            },
-            { distance: Infinity } as ClosestRoute
-          );
-
-          return closestPoint.distance < acc.distance ? closestPoint : acc;
-        },
-        { distance: Infinity } as ClosestRoute
-      );
-
-      if (closestRoute.distance < 50) {
-        this.popup
-          .setLatLng(closestRoute.point)
-          .setContent(
-            ReactDOMServer.renderToString(
-              <Popup feature={closestRoute.route.features[0]} />
-            )
-          )
-          .openOn(this.map);
-      } else {
-        this.map.closePopup(this.popup);
-      }
-    }
-  }, 30);
-
-  componentDidMount() {
-    this.initializeMap();
-  }
-
-  componentDidUpdate() {
-    this.updateMap();
-  }
+  onRouteHover = (route: Option<GeoJson>) => {
+    this.setState({
+      hoveredRoute: route
+    });
+  };
 
   render() {
-    return <div id="map" />;
+    if (!this.props.routes.ready) {
+      return null;
+    }
+
+    return (
+      <View className="app" height="100%">
+        <SideBar
+          routes={this.props.routes.value}
+          onRouteClick={this.onRouteSelect}
+          selectedRoute={this.state.selectedRoute}
+        />
+        <Map
+          routes={this.props.routes.value}
+          selectedRoute={this.state.selectedRoute}
+          hoveredRoute={this.state.hoveredRoute}
+          onRouteHover={this.onRouteHover}
+        />
+      </View>
+    );
   }
 }
 
