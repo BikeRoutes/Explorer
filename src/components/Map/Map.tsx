@@ -23,7 +23,8 @@ class App extends React.PureComponent<Props> {
   map: leaflet.Map;
   tileLayer: leaflet.Layer;
   popup: leaflet.Popup = leaflet.popup({
-    closeButton: false
+    closeButton: false,
+    autoPan: false
   });
 
   layers: leaflet.GeoJSON<GeoJson>[] = [];
