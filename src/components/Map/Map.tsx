@@ -8,6 +8,8 @@ import View from "View";
 import { Option, none, some } from "fp-ts/lib/Option";
 
 import "leaflet/dist/leaflet.css";
+import "leaflet/dist/images/marker-shadow.png";
+import "leaflet/dist/images/marker-icon-2x.png";
 
 type Props = {
   routes: GeoJson[];
