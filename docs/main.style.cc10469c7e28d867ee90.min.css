@@ -1,0 +1,49 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+.popup {
+  padding: 8px 16px;
+  max-width: 160px; }
+  .popup .name {
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 8px; }
+  .popup .distance,
+  .popup .elevation {
+    font-size: 13px;
+    font-weight: 400; }
+    .popup .distance label,
+    .popup .elevation label {
+      color: #666;
+      width: 60px;
+      font-size: 12px;
+      font-weight: 400; }
+  .popup .github-button {
+    margin: 12px -2px 6px -2px; }
+
+#map .leaflet-popup-pane .leaflet-popup-content-wrapper {
+  border-radius: 3px; }
+  #map .leaflet-popup-pane .leaflet-popup-content-wrapper .leaflet-popup-content {
+    margin: 0; }
+
+#map {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%; }
+
+:focus {
+  outline: none; }
+
+.focused > * {
+  outline: -webkit-focus-ring-color auto 5px;
+  outline-color: #204f7f; }
+
+html {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+  -webkit-font-smoothing: antialiased; }
+
+
+/*# sourceMappingURL=main.style.cc10469c7e28d867ee90.min.css.map*/
