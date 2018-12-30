@@ -8,8 +8,6 @@ import View from "View";
 import { Option, none, some } from "fp-ts/lib/Option";
 
 import "leaflet/dist/leaflet.css";
-import "leaflet/dist/images/marker-shadow.png";
-import "leaflet/dist/images/marker-icon-2x.png";
 
 type Props = {
   routes: GeoJson[];
@@ -80,8 +78,18 @@ class App extends React.PureComponent<Props> {
 
     this.markers = this.props.routes.map(route => {
       const coordinates = route.features[0].geometry.coordinates[0];
+
+      const markerIcon = leaflet.icon({
+        iconUrl: "https://i.ibb.co/k55dg2z/marker-icon-2x.png",
+        iconSize: [25, 41],
+        iconAnchor: [12.5, 40],
+        shadowUrl: "https://i.ibb.co/cYBsv0r/marker-shadow.png",
+        shadowSize: [41, 41],
+        shadowAnchor: [12.5, 40]
+      });
+
       return leaflet
-        .marker([coordinates[1], coordinates[0]])
+        .marker([coordinates[1], coordinates[0]], { icon: markerIcon })
         .on("click", () => {
           this.props.onRouteSelect(route);
         });
