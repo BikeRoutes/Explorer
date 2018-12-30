@@ -146,8 +146,20 @@ class App extends React.PureComponent<Props> {
     this.updateMap();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: Props) {
     this.updateMap();
+
+    if (
+      this.props.selectedRoute.isSome() &&
+      (prevProps.selectedRoute.isNone() ||
+        prevProps.selectedRoute.value !== this.props.selectedRoute.value)
+    ) {
+      this.map.fitBounds(
+        this.props.selectedRoute.value.features[0].geometry.coordinates.map(
+          (c): [number, number] => [c[1], c[0]]
+        )
+      );
+    }
   }
 
   render() {
