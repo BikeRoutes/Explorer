@@ -69,9 +69,13 @@ class App extends React.PureComponent<Props> {
           ? "#387ddf"
           : feature.properties.color;
 
-      return leaflet.geoJSON(route, {
-        style: () => ({ color })
-      });
+      return leaflet
+        .geoJSON(route, {
+          style: () => ({ color })
+        })
+        .on("click", () => {
+          this.props.onRouteSelect(route);
+        });
     });
 
     this.markers = this.props.routes.map(route => {
