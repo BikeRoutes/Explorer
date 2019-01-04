@@ -1,12 +1,10 @@
 import { Query, location, available } from "@buildo/bento/data";
 import * as API from "API";
-import { locationToView, GeoJson, Feature } from "model";
+import { locationToView, Geometry, Route } from "model";
 import * as stringToColor from "string-to-color";
 import * as geoJsonLength from "geojson-length";
 
-function getElevationGain(
-  coordinates: GeoJson["features"][number]["geometry"]["coordinates"]
-): number {
+function getElevationGain(coordinates: Geometry["coordinates"]): number {
   return coordinates.reduce((acc, c, index) => {
     const prevAltitude = index > 0 ? coordinates[index - 1][2] : undefined;
     const altitude = c[2];
@@ -30,11 +28,11 @@ export const currentView = Query({
 export const routes = Query({
   cacheStrategy: available,
   params: {},
-  fetch: (): Promise<GeoJson[]> =>
-    API.getRoutes().then((routes: GeoJson[]) =>
-      routes.map(route => {
-        const feature = route.features[0];
-        const richFeature: Feature = {
+  fetch: (): Promise<Route[]> =>
+    API.getRoutes().then(features =>
+      features.map(feature => {
+        const richFeature: Route = {
+          id: feature.properties.url,
           ...feature,
           properties: {
             ...feature.properties,
@@ -46,12 +44,7 @@ export const routes = Query({
           }
         };
 
-        const geoJson: GeoJson = {
-          ...route,
-          features: [richFeature]
-        };
-
-        return geoJson;
+        return richFeature;
       })
     )
 });

@@ -1,7 +1,7 @@
-import { Content, GeoJson } from "model";
+import { Content, GeoJSONFeatureCollection, GeoJSONFeature } from "model";
 import flatten = require("lodash/flatten");
 
-export const getRoutes = (): Promise<GeoJson[]> => {
+export const getRoutes = (): Promise<GeoJSONFeature[]> => {
   return fetch("https://api.github.com/repos/BikeRoutes/Milano/contents")
     .then(res => res.json())
     .then((contents: Content[]) => {
@@ -20,20 +20,15 @@ export const getRoutes = (): Promise<GeoJson[]> => {
       return Promise.all(
         contents.map(c =>
           fetch(c.download_url)
-            .then(r => r.json() as Promise<GeoJson>)
+            .then(r => r.json() as Promise<GeoJSONFeatureCollection>)
             .then(route => {
               const feature = route.features[0];
-              const geoJson: GeoJson = {
-                ...route,
-                features: [
-                  {
-                    ...feature,
-                    properties: {
-                      ...feature.properties,
-                      url: c.html_url
-                    }
-                  }
-                ]
+              const geoJson: GeoJSONFeature = {
+                ...feature,
+                properties: {
+                  ...feature.properties,
+                  url: c.html_url
+                }
               };
 
               return geoJson;

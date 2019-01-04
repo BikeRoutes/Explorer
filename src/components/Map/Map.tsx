@@ -1,177 +1,207 @@
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import throttle = require("lodash/throttle");
-import { GeoJson } from "model";
-import * as leaflet from "leaflet";
+import * as mapboxgl from "mapbox-gl";
 import Popup from "Popup/Popup";
 import View from "View";
 import { Option, none, some } from "fp-ts/lib/Option";
+import { Route } from "model";
 
-import "leaflet/dist/leaflet.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 type Props = {
-  routes: GeoJson[];
-  selectedRoute: Option<GeoJson>;
-  hoveredRoute: Option<GeoJson>;
-  onRouteHover: (route: Option<GeoJson>) => void;
-  onRouteSelect: (route: GeoJson) => void;
+  routes: Route[];
+  selectedRoute: Option<Route>;
+  hoveredRoute: Option<Route>;
+  onRouteHover: (route: Option<Route>) => void;
+  onRouteSelect: (route: Route) => void;
 };
 
 class App extends React.PureComponent<Props> {
-  map: leaflet.Map;
-  tileLayer: leaflet.Layer;
-  popup: leaflet.Popup = leaflet.popup({
+  map: Option<mapboxgl.Map> = none;
+  popup: mapboxgl.Popup = new mapboxgl.Popup({
     closeButton: false,
-    autoPan: false
+    closeOnClick: true,
+    offset: [0, -40],
+    anchor: "bottom"
   });
 
-  layers: leaflet.GeoJSON<GeoJson>[] = [];
-  markers: leaflet.Marker[] = [];
-
   initializeMap() {
-    // create map instance
-    this.map = leaflet.map("map", { preferCanvas: false });
+    (mapboxgl as any).accessToken =
+      "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThyejR6ODA2ZDk0M25rZzZjcGo4ZmcifQ.yRWHQbG1dJjDp43d01bBOw";
 
-    // init map with mapbox tiles
-    this.tileLayer = leaflet.tileLayer(
-      "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-      {
-        id: "mapbox.streets",
-        accessToken:
-          "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThzMDJrejJ1bzgzeGxjZTZ2aXR0cHMifQ.qzCmhZEf3Ta1YHvAfli3bA"
-      } as any
-    );
-
-    this.map.addLayer(this.tileLayer);
-
-    navigator.geolocation.getCurrentPosition(position => {
-      this.map.setView(
-        leaflet.latLng(position.coords.latitude, position.coords.longitude),
-        12
-      );
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/francescocioria/cjqi3u6lmame92rmw6aw3uyhm",
+      zoom: 11.0
     });
+
+    map.on("load", () => {
+      this.map = some(map);
+
+      this.addLayers();
+      this.addMarkers();
+
+      navigator.geolocation.getCurrentPosition(position => {
+        map.setCenter(
+          new mapboxgl.LngLat(
+            position.coords.longitude,
+            position.coords.latitude
+          )
+        );
+      });
+    });
+
+    map.on("mousemove", this.onMouseMove);
   }
 
-  updateMap() {
-    // clear previous layers and markers
-    this.layers.forEach(layer => layer.remove());
-    this.markers.forEach(marker => marker.remove());
+  getRouteColor(route: Route): string {
+    return (this.props.selectedRoute.isSome() &&
+      route === this.props.selectedRoute.value) ||
+      (this.props.hoveredRoute.isSome() &&
+        route === this.props.hoveredRoute.value)
+      ? "#387ddf"
+      : route.properties.color;
+  }
 
-    this.layers = this.props.routes.map(route => {
-      const feature = route.features[0];
-      const color =
-        (this.props.selectedRoute.isSome() &&
-          route === this.props.selectedRoute.value) ||
-        (this.props.hoveredRoute.isSome() &&
-          route === this.props.hoveredRoute.value)
-          ? "#387ddf"
-          : feature.properties.color;
+  addLayers() {
+    this.map.map(map => {
+      const layers = this.props.routes.map(route => {
+        const layer: mapboxgl.Layer = {
+          id: route.properties.url,
+          type: "line",
+          source: {
+            type: "geojson",
+            data: route as any
+          },
+          layout: {
+            "line-join": "round",
+            "line-cap": "round"
+          },
+          paint: {
+            "line-width": 3,
+            "line-color": this.getRouteColor(route)
+          }
+        };
 
-      return leaflet
-        .geoJSON(route, {
-          style: () => ({ color })
-        })
-        .on("click", () => {
+        map.on("click", layer.id, () => {
           this.props.onRouteSelect(route);
         });
-    });
 
-    this.markers = this.props.routes.map(route => {
-      const coordinates = route.features[0].geometry.coordinates[0];
-
-      const markerIcon = leaflet.icon({
-        iconUrl: "https://i.ibb.co/k55dg2z/marker-icon-2x.png",
-        iconSize: [25, 41],
-        iconAnchor: [12.5, 40],
-        shadowUrl: "https://i.ibb.co/cYBsv0r/marker-shadow.png",
-        shadowSize: [41, 41],
-        shadowAnchor: [12.5, 40]
+        return layer;
       });
 
-      return leaflet
-        .marker([coordinates[1], coordinates[0]], { icon: markerIcon })
-        .on("click", () => {
-          this.props.onRouteSelect(route);
-        });
+      layers.forEach(layer => map.addLayer(layer));
     });
-
-    this.layers.forEach(layer => this.map.addLayer(layer));
-    this.markers.forEach(marker => marker.addTo(this.map));
-
-    this.map.on("mousemove", this.onMouseMove);
   }
 
-  onMouseMove = throttle((e: leaflet.LeafletMouseEvent) => {
+  addMarkers() {
+    this.map.map(map => {
+      const markers = this.props.routes.map(route => {
+        const coordinates = route.geometry.coordinates[0];
+
+        const marker: mapboxgl.Marker = new mapboxgl.Marker().setLngLat([
+          coordinates[0],
+          coordinates[1]
+        ]);
+
+        return marker;
+      });
+
+      markers.forEach(marker => marker.addTo(map));
+    });
+  }
+
+  onMouseMove = throttle((e: mapboxgl.MapMouseEvent) => {
     type ClosestRoute = {
       distance: number;
-      point: leaflet.LatLng;
-      route: GeoJson;
+      route: Route;
     };
 
-    const closestRoute: ClosestRoute = this.props.routes.reduce(
-      (acc, route) => {
-        const closestPoint: ClosestRoute = route.features[0].geometry.coordinates.reduce(
-          (acc, coordinates) => {
-            const point = leaflet.latLng(coordinates[1], coordinates[0]);
-            const distance = this.map
-              .latLngToContainerPoint(
-                leaflet.latLng(coordinates[1], coordinates[0])
-              )
-              .distanceTo(this.map.latLngToContainerPoint(e.latlng));
+    this.map.map(map => {
+      const closestRoute: ClosestRoute = this.props.routes.reduce(
+        (acc, route) => {
+          const closestPoint: ClosestRoute = route.geometry.coordinates.reduce(
+            (acc, coordinates) => {
+              const point = map.project(
+                new mapboxgl.LngLat(coordinates[0], coordinates[1])
+              );
+              const mousePoint = map.project(
+                new mapboxgl.LngLat(e.lngLat.lng, e.lngLat.lat)
+              );
+              const distance = Math.sqrt(
+                Math.pow(Math.abs(point.x - mousePoint.x), 2) +
+                  Math.pow(Math.abs(point.y - mousePoint.y), 2)
+              );
+              return distance < acc.distance ? { distance, route } : acc;
+            },
+            { distance: Infinity } as ClosestRoute
+          );
 
-            return distance < acc.distance ? { distance, point, route } : acc;
-          },
-          { distance: Infinity } as ClosestRoute
-        );
-
-        return closestPoint.distance < acc.distance ? closestPoint : acc;
-      },
-      { distance: Infinity } as ClosestRoute
-    );
-
-    if (closestRoute.distance < 25) {
-      const startPointCoordinates =
-        closestRoute.route.features[0].geometry.coordinates[0];
-
-      const latLng: leaflet.LatLng = leaflet.latLng(
-        startPointCoordinates[1],
-        startPointCoordinates[0]
+          return closestPoint.distance < acc.distance ? closestPoint : acc;
+        },
+        { distance: Infinity } as ClosestRoute
       );
 
-      this.popup
-        .setLatLng(latLng)
-        .setContent(
-          ReactDOMServer.renderToString(
-            <Popup feature={closestRoute.route.features[0]} />
-          )
-        )
-        .openOn(this.map);
+      if (closestRoute.distance < 25) {
+        const startPointCoordinates =
+          closestRoute.route.geometry.coordinates[0];
 
-      this.props.onRouteHover(some(closestRoute.route));
-    } else {
-      this.props.onRouteHover(none);
-      this.map.closePopup(this.popup);
-    }
-  }, 30);
+        const latLng: mapboxgl.LngLat = new mapboxgl.LngLat(
+          startPointCoordinates[0],
+          startPointCoordinates[1]
+        );
+
+        this.popup
+          .setLngLat(latLng)
+          .setHTML(
+            ReactDOMServer.renderToString(<Popup route={closestRoute.route} />)
+          )
+          .addTo(map);
+
+        this.props.onRouteHover(some(closestRoute.route));
+      } else {
+        this.props.onRouteHover(none);
+        this.popup.remove();
+      }
+    });
+  }, 60);
+
+  updateLayers() {
+    this.map.map(map => {
+      this.props.routes.forEach(route => {
+        // update color
+        map.setPaintProperty(route.id, "line-color", this.getRouteColor(route));
+      });
+    });
+  }
+
+  flyToRoute(route: Route) {
+    this.map.map(map => {
+      const coordinates = route.geometry.coordinates as [number, number][];
+      const bounds = coordinates
+        .map(coord => new mapboxgl.LngLatBounds(coord, coord))
+        .reduce((bounds, coord) => {
+          return bounds.extend(coord);
+        });
+
+      map.fitBounds(bounds, { padding: 50 });
+    });
+  }
 
   componentDidMount() {
     this.initializeMap();
-    this.updateMap();
   }
 
   componentDidUpdate(prevProps: Props) {
-    this.updateMap();
+    this.updateLayers();
 
     if (
       this.props.selectedRoute.isSome() &&
       (prevProps.selectedRoute.isNone() ||
         prevProps.selectedRoute.value !== this.props.selectedRoute.value)
     ) {
-      this.map.fitBounds(
-        this.props.selectedRoute.value.features[0].geometry.coordinates.map(
-          (c): [number, number] => [c[1], c[0]]
-        )
-      );
+      this.flyToRoute(this.props.selectedRoute.value);
     }
   }
 

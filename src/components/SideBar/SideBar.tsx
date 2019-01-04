@@ -1,13 +1,13 @@
 import * as React from "react";
 import * as cx from "classnames";
 import View from "View";
-import { GeoJson, Feature } from "model";
+import { Route } from "model";
 
 import "./sideBar.scss";
 import { Option } from "fp-ts/lib/Option";
 
 const Route = (props: {
-  feature: Feature;
+  route: Route;
   onClick: () => void;
   isSelected: boolean;
 }) => (
@@ -16,18 +16,18 @@ const Route = (props: {
     column
     onClick={props.onClick}
   >
-    <View className="name">{props.feature.properties.name}</View>
+    <View className="name">{props.route.properties.name}</View>
     <View className="distance" vAlignContent="bottom">
-      <label>Distance</label> {props.feature.properties.length} km
+      <label>Distance</label> {props.route.properties.length} km
     </View>
     <View className="elevation" vAlignContent="bottom">
-      <label>Elevation</label> {props.feature.properties.elevationGain} m
+      <label>Elevation</label> {props.route.properties.elevationGain} m
     </View>
 
     <View className="actions">
       <a
         className="github-button"
-        href={props.feature.properties.url}
+        href={props.route.properties.url}
         target="_blank"
       >
         See on GitHub
@@ -37,9 +37,9 @@ const Route = (props: {
 );
 
 type Props = {
-  routes: GeoJson[];
-  onRouteClick: (route: GeoJson) => void;
-  selectedRoute: Option<GeoJson>;
+  routes: Route[];
+  onRouteClick: (route: Route) => void;
+  selectedRoute: Option<Route>;
 };
 
 class SideBar extends React.Component<Props> {
@@ -50,7 +50,7 @@ class SideBar extends React.Component<Props> {
         {this.props.routes.map((route, index) => (
           <Route
             key={index}
-            feature={route.features[0]}
+            route={route}
             onClick={() => this.props.onRouteClick(route)}
             isSelected={
               this.props.selectedRoute.isSome() &&
