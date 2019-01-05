@@ -10,6 +10,7 @@ import { Option, none, some } from "fp-ts/lib/Option";
 import { Route } from "model";
 
 import "mapbox-gl/dist/mapbox-gl.css";
+import { identity } from "fp-ts/lib/function";
 
 type Props = {
   routes: Route[];
@@ -19,14 +20,17 @@ type Props = {
   onRouteSelect: (route: Route) => void;
 };
 
+const popupSettings: mapboxgl.PopupOptions = {
+  closeButton: false,
+  closeOnClick: true,
+  offset: [0, -40],
+  anchor: "bottom"
+};
+
 class App extends React.PureComponent<Props> {
   map: Option<mapboxgl.Map> = none;
-  popup: mapboxgl.Popup = new mapboxgl.Popup({
-    closeButton: false,
-    closeOnClick: true,
-    offset: [0, -40],
-    anchor: "bottom"
-  });
+  popupSelectedRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
+  popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
 
   initializeMap() {
     (mapboxgl as any).accessToken =
@@ -147,25 +151,9 @@ class App extends React.PureComponent<Props> {
       );
 
       if (closestRoute.distance < 25) {
-        const startPointCoordinates =
-          closestRoute.route.geometry.coordinates[0];
-
-        const latLng: mapboxgl.LngLat = new mapboxgl.LngLat(
-          startPointCoordinates[0],
-          startPointCoordinates[1]
-        );
-
-        this.popup
-          .setLngLat(latLng)
-          .setHTML(
-            ReactDOMServer.renderToString(<Popup route={closestRoute.route} />)
-          )
-          .addTo(map);
-
         this.props.onRouteHover(some(closestRoute.route));
       } else {
         this.props.onRouteHover(none);
-        this.popup.remove();
       }
     });
   }, 60);
@@ -192,12 +180,48 @@ class App extends React.PureComponent<Props> {
     });
   }
 
+  showPopup(route: Route, popup: mapboxgl.Popup) {
+    this.map.map(map => {
+      const latLng: mapboxgl.LngLat = new mapboxgl.LngLat(
+        route.geometry.coordinates[0][0],
+        route.geometry.coordinates[0][1]
+      );
+
+      popup
+        .setLngLat(latLng)
+        .setHTML(ReactDOMServer.renderToString(<Popup route={route} />))
+        .addTo(map);
+    });
+  }
+
+  updateSelectedRoutePopup() {
+    if (this.props.selectedRoute.isSome()) {
+      this.showPopup(this.props.selectedRoute.value, this.popupSelectedRoute);
+    } else {
+      this.popupSelectedRoute.remove();
+    }
+  }
+
+  updateHoveredRoutePopup() {
+    const { hoveredRoute } = this.props;
+    if (
+      hoveredRoute.isSome() &&
+      hoveredRoute.value !== this.props.selectedRoute.fold(null, identity)
+    ) {
+      this.showPopup(hoveredRoute.value, this.popupHoveredRoute);
+    } else {
+      this.popupHoveredRoute.remove();
+    }
+  }
+
   componentDidMount() {
     this.initializeMap();
   }
 
   componentDidUpdate(prevProps: Props) {
     this.updateLayers();
+    this.updateSelectedRoutePopup();
+    this.updateHoveredRoutePopup();
 
     if (
       this.props.selectedRoute.isSome() &&
