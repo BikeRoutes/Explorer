@@ -4,7 +4,7 @@ import { routes } from "queries";
 import View from "View";
 import Map from "Map/Map";
 import SideBar from "SideBar/SideBar";
-import { GeoJson } from "model";
+import { Route } from "model";
 import { Option, none, some } from "fp-ts/lib/Option";
 
 const queries = declareQueries({ routes });
@@ -12,8 +12,8 @@ const queries = declareQueries({ routes });
 type Props = typeof queries.Props;
 
 type State = {
-  selectedRoute: Option<GeoJson>;
-  hoveredRoute: Option<GeoJson>;
+  selectedRoute: Option<Route>;
+  hoveredRoute: Option<Route>;
 };
 
 class App extends React.Component<Props, State> {
@@ -22,7 +22,7 @@ class App extends React.Component<Props, State> {
     hoveredRoute: none
   };
 
-  onRouteSelect = (route: GeoJson) => {
+  onRouteSelect = (route: Route) => {
     this.setState({
       selectedRoute:
         this.state.selectedRoute.isSome() &&
@@ -32,7 +32,7 @@ class App extends React.Component<Props, State> {
     });
   };
 
-  onRouteHover = (route: Option<GeoJson>) => {
+  onRouteHover = (route: Option<Route>) => {
     this.setState({
       hoveredRoute: route
     });

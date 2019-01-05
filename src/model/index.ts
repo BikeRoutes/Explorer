@@ -30,7 +30,12 @@ export type Content = {
   html_url: string;
 };
 
-export type Feature = {
+export type Geometry = {
+  type: "LineString";
+  coordinates: Array<[number, number, number?]>;
+};
+
+export type GeoJSONFeature = {
   type: "Feature";
   properties: {
     name: string;
@@ -39,13 +44,11 @@ export type Feature = {
     elevationGain: number;
     url: string;
   };
-  geometry: {
-    type: "LineString";
-    coordinates: Array<[number, number, number]>;
-  };
+  geometry: Geometry;
+};
+export type GeoJSONFeatureCollection = {
+  type: "FeatureCollection";
+  features: GeoJSONFeature[];
 };
 
-export type GeoJson = {
-  type: "FeatureCollection";
-  features: [Feature];
-};
+export type Route = GeoJSONFeature & { id: string };
