@@ -1,8 +1,10 @@
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
+import * as ReactDOM from "react-dom";
 import throttle = require("lodash/throttle");
 import * as mapboxgl from "mapbox-gl";
 import Popup from "Popup/Popup";
+import Marker from "Marker/Marker";
 import View from "View";
 import { Option, none, some } from "fp-ts/lib/Option";
 import { Route } from "model";
@@ -66,7 +68,7 @@ class App extends React.PureComponent<Props> {
 
   addLayers() {
     this.map.map(map => {
-      const layers = this.props.routes.map(route => {
+      this.props.routes.forEach(route => {
         const layer: mapboxgl.Layer = {
           id: route.properties.url,
           type: "line",
@@ -88,27 +90,28 @@ class App extends React.PureComponent<Props> {
           this.props.onRouteSelect(route);
         });
 
-        return layer;
+        map.addLayer(layer);
       });
-
-      layers.forEach(layer => map.addLayer(layer));
     });
   }
 
   addMarkers() {
     this.map.map(map => {
-      const markers = this.props.routes.map(route => {
+      this.props.routes.forEach(route => {
         const coordinates = route.geometry.coordinates[0];
 
-        const marker: mapboxgl.Marker = new mapboxgl.Marker().setLngLat([
-          coordinates[0],
-          coordinates[1]
-        ]);
+        const element = document.createElement("div");
+        ReactDOM.render(
+          <Marker onClick={() => this.props.onRouteSelect(route)} />,
+          element
+        );
 
-        return marker;
+        const marker: mapboxgl.Marker = new mapboxgl.Marker({
+          element
+        }).setLngLat([coordinates[0], coordinates[1]]);
+
+        marker.addTo(map);
       });
-
-      markers.forEach(marker => marker.addTo(map));
     });
   }
 
