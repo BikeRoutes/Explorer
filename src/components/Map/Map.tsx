@@ -12,19 +12,38 @@ import { Route } from "model";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { identity } from "fp-ts/lib/function";
 
+const popupSettings: mapboxgl.PopupOptions = {
+  closeButton: false,
+  closeOnClick: true,
+  offset: [0, -40],
+  anchor: "bottom"
+};
+
+export const getRouteDistanceInPixels = (
+  route: Route,
+  lngLat: mapboxgl.LngLat,
+  map: mapboxgl.Map
+): number => {
+  return route.geometry.coordinates.reduce((acc, coordinates) => {
+    const point = map.project(new mapboxgl.LngLat(lngLat.lng, lngLat.lat));
+    const routePoint = map.project(
+      new mapboxgl.LngLat(coordinates[0], coordinates[1])
+    );
+    const distance = Math.sqrt(
+      Math.pow(Math.abs(point.x - routePoint.x), 2) +
+        Math.pow(Math.abs(point.y - routePoint.y), 2)
+    );
+    return distance < acc ? distance : acc;
+  }, Infinity);
+};
+
 type Props = {
   routes: Route[];
   selectedRoute: Option<Route>;
   hoveredRoute: Option<Route>;
   onRouteHover: (route: Option<Route>) => void;
   onRouteSelect: (route: Route) => void;
-};
-
-const popupSettings: mapboxgl.PopupOptions = {
-  closeButton: false,
-  closeOnClick: true,
-  offset: [0, -40],
-  anchor: "bottom"
+  innerRef: (map: Option<mapboxgl.Map>) => void;
 };
 
 class App extends React.PureComponent<Props> {
@@ -125,27 +144,14 @@ class App extends React.PureComponent<Props> {
       route: Route;
     };
 
+    this.props.innerRef(this.map);
+
     this.map.map(map => {
       const closestRoute: ClosestRoute = this.props.routes.reduce(
         (acc, route) => {
-          const closestPoint: ClosestRoute = route.geometry.coordinates.reduce(
-            (acc, coordinates) => {
-              const point = map.project(
-                new mapboxgl.LngLat(coordinates[0], coordinates[1])
-              );
-              const mousePoint = map.project(
-                new mapboxgl.LngLat(e.lngLat.lng, e.lngLat.lat)
-              );
-              const distance = Math.sqrt(
-                Math.pow(Math.abs(point.x - mousePoint.x), 2) +
-                  Math.pow(Math.abs(point.y - mousePoint.y), 2)
-              );
-              return distance < acc.distance ? { distance, route } : acc;
-            },
-            { distance: Infinity } as ClosestRoute
-          );
+          const distance = getRouteDistanceInPixels(route, e.lngLat, map);
 
-          return closestPoint.distance < acc.distance ? closestPoint : acc;
+          return distance < acc.distance ? { distance, route } : acc;
         },
         { distance: Infinity } as ClosestRoute
       );
@@ -216,6 +222,7 @@ class App extends React.PureComponent<Props> {
 
   componentDidMount() {
     this.initializeMap();
+    this.props.innerRef(this.map);
   }
 
   componentDidUpdate(prevProps: Props) {

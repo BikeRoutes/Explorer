@@ -2,10 +2,11 @@ import * as React from "react";
 import { declareQueries } from "@buildo/bento/data";
 import { routes } from "queries";
 import View from "View";
-import Map from "Map/Map";
+import Map, { getRouteDistanceInPixels } from "Map/Map";
 import SideBar from "SideBar/SideBar";
 import { Route } from "model";
 import { Option, none, some } from "fp-ts/lib/Option";
+import sortBy = require("lodash/sortBy");
 
 const queries = declareQueries({ routes });
 
@@ -17,6 +18,8 @@ type State = {
 };
 
 class App extends React.Component<Props, State> {
+  map: Option<mapboxgl.Map> = none;
+
   state: State = {
     selectedRoute: none,
     hoveredRoute: none
@@ -39,23 +42,31 @@ class App extends React.Component<Props, State> {
   };
 
   render() {
-    if (!this.props.routes.ready) {
+    const routes = this.props.routes;
+    if (!routes.ready) {
       return null;
     }
+
+    const sortedRoutes: Route[] = this.map.fold(routes.value, map =>
+      sortBy(routes.value, route =>
+        getRouteDistanceInPixels(route, map.getCenter(), map)
+      )
+    );
 
     return (
       <View className="app" height="100%">
         <SideBar
-          routes={this.props.routes.value}
+          routes={sortedRoutes}
           onRouteClick={this.onRouteSelect}
           selectedRoute={this.state.selectedRoute}
         />
         <Map
-          routes={this.props.routes.value}
+          routes={routes.value}
           selectedRoute={this.state.selectedRoute}
           hoveredRoute={this.state.hoveredRoute}
           onRouteHover={this.onRouteHover}
           onRouteSelect={this.onRouteSelect}
+          innerRef={map => (this.map = map)}
         />
       </View>
     );
