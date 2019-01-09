@@ -1,23 +1,32 @@
 import { HistoryLocation } from "@buildo/bento/data";
+import { Option, fromNullable } from "fp-ts/lib/Option";
 
 export { HistoryLocation };
 
-export type CurrentView = "home" | "hello";
+export type CurrentView =
+  | { view: "explorer" }
+  | { view: "details"; routeId: Option<string> };
 
 export function locationToView(location: HistoryLocation): CurrentView {
   switch (location.pathname) {
-    case "/hello":
-      return "hello";
+    case "/details":
+      return {
+        view: "details",
+        routeId: fromNullable(location.search.routeId)
+      };
     default:
-      return "home";
+      return { view: "explorer" };
   }
 }
 
 export function viewToLocation(view: CurrentView): HistoryLocation {
-  switch (view) {
-    case "hello":
-      return { pathname: "/hello", search: {} };
-    default:
+  switch (view.view) {
+    case "details":
+      return {
+        pathname: "/details",
+        search: { routeId: view.routeId.getOrElse("") }
+      };
+    case "explorer":
       return { pathname: "/", search: {} };
   }
 }

@@ -1,0 +1,57 @@
+.details {
+  padding: 16px 100px 0 100px;
+  overflow: auto;
+
+  .markdown {
+    color: #222;
+    padding-bottom: 48px;
+
+    .remarkable {
+      img {
+        height: 0;
+        width: 0;
+        visibility: hidden;
+      }
+
+      h1 {
+        font-weight: 500;
+        font-size: 36px;
+      }
+
+      p {
+        font-size: 16px;
+        margin: 0;
+        margin-bottom: 4px;
+        max-width: calc(1200px - 300px - 64px);
+      }
+    }
+
+    .summary {
+      > div:not(:last-child) {
+        margin-right: 24px;
+      }
+
+      label {
+        color: #666;
+        font-size: 14px;
+        font-weight: 400;
+      }
+
+      span {
+        font-size: 26px;
+        font-weight: 500;
+      }
+    }
+
+    .images {
+      img {
+        margin-top: 32px;
+        height: 200px;
+      }
+    }
+  }
+
+  .map-wrapper {
+    margin: 0 -100px;
+  }
+}

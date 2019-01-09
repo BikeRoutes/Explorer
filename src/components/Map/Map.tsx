@@ -44,6 +44,7 @@ type Props = {
   onRouteHover: (route: Option<Route>) => void;
   onRouteSelect: (route: Route) => void;
   innerRef: (map: Option<mapboxgl.Map>) => void;
+  startPosition: "userLocation" | "firstRoute";
 };
 
 class App extends React.PureComponent<Props> {
@@ -67,14 +68,23 @@ class App extends React.PureComponent<Props> {
       this.addLayers();
       this.addMarkers();
 
-      navigator.geolocation.getCurrentPosition(position => {
-        map.setCenter(
-          new mapboxgl.LngLat(
-            position.coords.longitude,
-            position.coords.latitude
-          )
-        );
-      });
+      if (this.props.startPosition === "userLocation") {
+        navigator.geolocation.getCurrentPosition(position => {
+          map.setCenter(
+            new mapboxgl.LngLat(
+              position.coords.longitude,
+              position.coords.latitude
+            )
+          );
+        });
+      }
+
+      if (
+        this.props.startPosition === "firstRoute" &&
+        this.props.routes.length > 0
+      ) {
+        this.flyToRoute(this.props.routes[0], { animate: false, padding: 80 });
+      }
     });
 
     map.on("mousemove", this.onMouseMove);
@@ -173,7 +183,7 @@ class App extends React.PureComponent<Props> {
     });
   }
 
-  flyToRoute(route: Route) {
+  flyToRoute(route: Route, options?: mapboxgl.FitBoundsOptions) {
     this.map.map(map => {
       const coordinates = route.geometry.coordinates as [number, number][];
       const bounds = coordinates
@@ -182,7 +192,7 @@ class App extends React.PureComponent<Props> {
           return bounds.extend(coord);
         });
 
-      map.fitBounds(bounds, { padding: 50 });
+      map.fitBounds(bounds, { padding: 50, ...options });
     });
   }
 

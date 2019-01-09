@@ -17,6 +17,7 @@
     "mapbox-gl": "^0.52.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "remarkable": "^1.7.1",
     "string-to-color": "^2.0.1"
   },
   "devDependencies": {
@@ -30,6 +31,7 @@
     "@types/react-dom": "^16.0.3",
     "@types/react-intl": "^2.3.3",
     "@types/react-select": "^1.1.0",
-    "@types/react-transition-group": "^2.0.6"
+    "@types/react-transition-group": "^2.0.6",
+    "@types/remarkable": "^1.7.2"
   }
 }

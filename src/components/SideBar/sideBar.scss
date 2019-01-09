@@ -2,6 +2,7 @@
   width: 280px;
   padding: 16px 0;
   background: #fff;
+  overflow: auto;
 
   h2 {
     margin: 0;
@@ -39,14 +40,7 @@
     }
 
     .actions {
-      a {
-        margin-top: 8px;
-        color: lighten($color: #0000ff, $amount: 25%);
-
-        &:hover {
-          color: lighten($color: #0000ff, $amount: 15%);
-        }
-      }
+      margin-top: 16px;
     }
   }
 }
