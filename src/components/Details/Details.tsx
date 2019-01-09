@@ -4,10 +4,22 @@ import { route, routeReadme } from "queries";
 import View from "View";
 import Map from "../Map/Map";
 import * as Remarkable from "remarkable";
-
-import "./details.scss";
 import { none } from "fp-ts/lib/Option";
 import { Route } from "model";
+import Button from "@buildo/bento/components/Button";
+import { saveAs } from "file-saver";
+
+const togpx = require("togpx");
+
+import "./details.scss";
+
+const saveGPX = (route: Route): void => {
+  const blob = new Blob([togpx(route)], {
+    type: "text/plain;charset=utf-8"
+  });
+
+  saveAs(blob, `${route.properties.name}.gpx`);
+};
 
 class Markdown extends React.PureComponent<{
   routeReadme: string;
@@ -22,14 +34,26 @@ class Markdown extends React.PureComponent<{
       ".markdown img"
     );
 
+    const h1: HTMLElement | null = document.querySelector("h1");
+
     return (
       <View className="markdown" hAlignContent="center" shrink={false}>
         <View style={{ maxWidth: 1200 }} grow>
-          <View basis="70%" column>
+          <View basis="70%" column style={{ position: "relative" }}>
             <View
+              className="actions"
+              style={{ left: h1 ? h1.clientWidth : undefined }}
+            >
+              <Button
+                flat
+                size="tiny"
+                label="Download GPX"
+                onClick={() => saveGPX(this.props.route)}
+              />
+            </View>
+
+            <div
               className="remarkable"
-              column
-              grow
               dangerouslySetInnerHTML={{
                 __html: md.render(this.props.routeReadme)
               }}

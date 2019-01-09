@@ -12,16 +12,19 @@
     "@buildo/bento": "^10.0.0",
     "classnames": "^2.2.5",
     "es6-promise": "^4.2.2",
+    "file-saver": "^2.0.0",
     "geojson-length": "^0.1.1",
     "lodash": "^4.17.4",
     "mapbox-gl": "^0.52.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "remarkable": "^1.7.1",
-    "string-to-color": "^2.0.1"
+    "string-to-color": "^2.0.1",
+    "togpx": "^0.5.4"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.3",
+    "@types/file-saver": "^2.0.0",
     "@types/fixed-data-table": "^0.6.32",
     "@types/lodash": "^4.14.93",
     "@types/mapbox-gl": "^0.51.3",

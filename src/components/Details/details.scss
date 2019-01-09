@@ -6,7 +6,20 @@
     color: #222;
     padding-bottom: 48px;
 
+    .actions {
+      position: absolute;
+      top: 32px;
+      right: 0;
+      padding-left: 24px;
+
+      .button {
+        height: 26px;
+      }
+    }
+
     .remarkable {
+      padding-right: 32px;
+
       img {
         height: 0;
         width: 0;
@@ -16,6 +29,7 @@
       h1 {
         font-weight: 500;
         font-size: 36px;
+        display: inline-block;
       }
 
       p {
