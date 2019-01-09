@@ -38,8 +38,8 @@ class Markdown extends React.PureComponent<{
 
     return (
       <View className="markdown" hAlignContent="center" shrink={false}>
-        <View style={{ maxWidth: 1200 }} grow>
-          <View basis="70%" column style={{ position: "relative" }}>
+        <View className="wrapper" grow>
+          <View grow column style={{ position: "relative" }}>
             <View
               className="actions"
               style={{ left: h1 ? h1.clientWidth : undefined }}
@@ -70,7 +70,7 @@ class Markdown extends React.PureComponent<{
               </View>
             </View>
           </View>
-          <View className="images" hAlignContent="right" basis="30%">
+          <View className="images" hAlignContent="right" shrink={false}>
             {Array.from(images).map(image => (
               <img key={image.src} src={image.src} />
             ))}
@@ -106,7 +106,7 @@ class Details extends React.Component<Props> {
           routeReadme={this.props.routeReadme.value.value}
           route={this.props.route.value.value}
         />
-        <View basis={600} className="map-wrapper">
+        <View shrink={false} className="map-wrapper">
           <Map
             routes={[this.props.route.value.value]}
             startPosition="firstRoute"

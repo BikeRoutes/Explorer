@@ -1,0 +1,9 @@
+.explorer {
+  height: 100%;
+}
+
+@media screen and (max-width: 900px) {
+  .explorer {
+    flex-direction: column-reverse !important;
+  }
+}

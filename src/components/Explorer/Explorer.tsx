@@ -8,6 +8,8 @@ import { Route } from "model";
 import { Option, none, some } from "fp-ts/lib/Option";
 import sortBy = require("lodash/sortBy");
 
+import "./explorer.scss";
+
 const queries = declareQueries({ routes });
 
 type Props = typeof queries.Props;
@@ -54,7 +56,7 @@ class Explorer extends React.Component<Props, State> {
     );
 
     return (
-      <View height="100%" grow>
+      <View className="explorer" grow>
         <SideBar
           routes={sortedRoutes}
           onRouteClick={this.onRouteSelect}

@@ -44,3 +44,33 @@
     }
   }
 }
+
+@media screen and (max-width: 900px) {
+  .side-bar {
+    flex-direction: row !important;
+    width: 100%;
+    padding: 0;
+
+    h2 {
+      display: none;
+    }
+
+    .route {
+      border-bottom: none;
+      width: 260px;
+      height: 160px;
+
+      &:not(:last-child) {
+        border-right: 1px solid #eaeaea;
+      }
+
+      &:hover {
+        background: white;
+      }
+
+      .actions {
+        margin-top: auto;
+      }
+    }
+  }
+}
