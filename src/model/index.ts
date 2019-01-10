@@ -23,11 +23,11 @@ export function viewToLocation(view: CurrentView): HistoryLocation {
   switch (view.view) {
     case "details":
       return {
-        pathname: "/",
+        pathname: "/Explorer",
         search: { view: "details", routeId: view.routeId.getOrElse("") }
       };
     case "explorer":
-      return { pathname: "/", search: {} };
+      return { pathname: "/Explorer", search: {} };
   }
 }
 
