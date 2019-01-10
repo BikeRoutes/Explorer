@@ -85,7 +85,7 @@ class App extends React.PureComponent<Props> {
       }
     });
 
-    map.on("mousemove", this.onMouseMove);
+    map.on(md.isDesktop ? "mousemove" : "touchmove", this.onMouseMove);
 
     map.addControl(new mapboxgl.FullscreenControl());
 
