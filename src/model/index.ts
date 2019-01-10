@@ -8,8 +8,8 @@ export type CurrentView =
   | { view: "details"; routeId: Option<string> };
 
 export function locationToView(location: HistoryLocation): CurrentView {
-  switch (location.pathname) {
-    case "/details":
+  switch (location.search.view) {
+    case "details":
       return {
         view: "details",
         routeId: fromNullable(location.search.routeId)
@@ -23,8 +23,8 @@ export function viewToLocation(view: CurrentView): HistoryLocation {
   switch (view.view) {
     case "details":
       return {
-        pathname: "/details",
-        search: { routeId: view.routeId.getOrElse("") }
+        pathname: "/",
+        search: { view: "details", routeId: view.routeId.getOrElse("") }
       };
     case "explorer":
       return { pathname: "/", search: {} };
