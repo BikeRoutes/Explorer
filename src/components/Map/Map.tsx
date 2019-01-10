@@ -85,7 +85,11 @@ class App extends React.PureComponent<Props> {
       }
     });
 
-    map.on(md.isDesktop ? "mousemove" : "touchmove", this.onMouseMove);
+    if (md.isDesktop) {
+      map.on("mousemove", this.onMouseMove);
+    }
+
+    map.on("moveend", () => this.props.innerRef(this.map));
 
     map.addControl(new mapboxgl.FullscreenControl());
 
@@ -173,8 +177,6 @@ class App extends React.PureComponent<Props> {
       distance: number;
       route: Route;
     };
-
-    this.props.innerRef(this.map);
 
     this.map.map(map => {
       const closestRoute: ClosestRoute = this.props.routes.reduce(

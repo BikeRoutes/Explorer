@@ -68,7 +68,10 @@ class Explorer extends React.Component<Props, State> {
           hoveredRoute={this.state.hoveredRoute}
           onRouteHover={this.onRouteHover}
           onRouteSelect={this.onRouteSelect}
-          innerRef={map => (this.map = map)}
+          innerRef={map => {
+            this.map = map;
+            this.forceUpdate();
+          }}
           startPosition="userLocation"
         />
       </View>
