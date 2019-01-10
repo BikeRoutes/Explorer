@@ -45,7 +45,8 @@
   }
 }
 
-@media screen and (max-width: 900px) {
+.is-phone,
+.is-tablet {
   .side-bar {
     flex-direction: row !important;
     width: 100%;
@@ -65,7 +66,11 @@
       }
 
       &:hover {
-        background: white;
+        background: unset;
+      }
+
+      &.is-selected {
+        background: #f5f5f5;
       }
 
       .actions {

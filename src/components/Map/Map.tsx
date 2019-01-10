@@ -8,9 +8,12 @@ import Marker from "Marker/Marker";
 import View from "View";
 import { Option, none, some } from "fp-ts/lib/Option";
 import { Route } from "model";
+import mobileDetect from "@buildo/bento/utils/mobileDetect";
+import { identity } from "fp-ts/lib/function";
 
 import "mapbox-gl/dist/mapbox-gl.css";
-import { identity } from "fp-ts/lib/function";
+
+const md = mobileDetect();
 
 const popupSettings: mapboxgl.PopupOptions = {
   closeButton: false,
@@ -69,14 +72,9 @@ class App extends React.PureComponent<Props> {
       this.addMarkers();
 
       if (this.props.startPosition === "userLocation") {
-        navigator.geolocation.getCurrentPosition(position => {
-          map.setCenter(
-            new mapboxgl.LngLat(
-              position.coords.longitude,
-              position.coords.latitude
-            )
-          );
-        });
+        document
+          .querySelector<HTMLButtonElement>(".mapboxgl-ctrl-geolocate")!
+          .click();
       }
 
       if (
@@ -88,6 +86,28 @@ class App extends React.PureComponent<Props> {
     });
 
     map.on("mousemove", this.onMouseMove);
+
+    map.addControl(new mapboxgl.FullscreenControl());
+
+    map.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserLocation: true,
+        fitBoundsOptions: {
+          maxZoom: 11
+        }
+      })
+    );
+
+    map.addControl(
+      new mapboxgl.NavigationControl({
+        showZoom: md.isDesktop,
+        showCompass: !md.isDesktop
+      })
+    );
   }
 
   getRouteColor(route: Route): string {

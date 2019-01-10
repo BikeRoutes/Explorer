@@ -5,6 +5,7 @@
   .markdown {
     color: #222;
     padding-bottom: 48px;
+    min-height: 300px;
 
     .wrapper {
       max-width: 1200px;
@@ -78,7 +79,8 @@
   }
 }
 
-@media screen and (max-width: 900px) {
+.is-phone,
+.is-tablet {
   .details {
     padding: 16px 16px 0 16px;
 
