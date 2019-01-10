@@ -97,7 +97,7 @@ class App extends React.PureComponent<Props> {
         trackUserLocation: true,
         showUserLocation: true,
         fitBoundsOptions: {
-          maxZoom: 11
+          maxZoom: this.props.startPosition === "firstRoute" ? 15 : 11
         }
       })
     );
