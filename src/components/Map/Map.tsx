@@ -17,7 +17,7 @@ const md = mobileDetect();
 
 const popupSettings: mapboxgl.PopupOptions = {
   closeButton: false,
-  closeOnClick: true,
+  closeOnClick: false,
   offset: [0, -40],
   anchor: "bottom"
 };
