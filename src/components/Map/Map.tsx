@@ -54,6 +54,7 @@ class App extends React.PureComponent<Props> {
   map: Option<mapboxgl.Map> = none;
   popupSelectedRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
+  positionWatch: Option<number>;
 
   initializeMap() {
     (mapboxgl as any).accessToken =
@@ -62,6 +63,10 @@ class App extends React.PureComponent<Props> {
     const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/francescocioria/cjqi3u6lmame92rmw6aw3uyhm",
+      center: {
+        lat: parseFloat(localStorage.getItem("start_lat") || "0"),
+        lng: parseFloat(localStorage.getItem("start_lng") || "0")
+      },
       zoom: 11.0
     });
 
@@ -255,6 +260,14 @@ class App extends React.PureComponent<Props> {
   componentDidMount() {
     this.initializeMap();
     this.props.innerRef(this.map);
+
+    this.positionWatch = some(
+      navigator.geolocation.watchPosition(position => {
+        console.log(position);
+        localStorage.setItem("start_lat", String(position.coords.latitude));
+        localStorage.setItem("start_lng", String(position.coords.longitude));
+      })
+    );
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -269,6 +282,10 @@ class App extends React.PureComponent<Props> {
     ) {
       this.flyToRoute(this.props.selectedRoute.value);
     }
+  }
+
+  componentWillUnmount() {
+    this.positionWatch.map(navigator.geolocation.clearWatch);
   }
 
   render() {
