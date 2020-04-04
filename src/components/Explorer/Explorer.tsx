@@ -1,12 +1,12 @@
 import * as React from "react";
 import { declareQueries } from "@buildo/bento/data";
-import { routes } from "queries";
-import View from "View";
-import Map, { getRouteDistanceInPixels } from "Map/Map";
-import SideBar from "SideBar/SideBar";
-import { Route } from "model";
+import { routes } from "../../queries";
+import View from "../View";
+import Map, { getRouteDistanceInPixels } from "../Map/Map";
+import SideBar from "../SideBar/SideBar";
+import { Route } from "../../model";
 import { Option, none, some } from "fp-ts/lib/Option";
-import sortBy = require("lodash/sortBy");
+import sortBy from "lodash/sortBy";
 
 import "./explorer.scss";
 
@@ -44,37 +44,38 @@ class Explorer extends React.Component<Props, State> {
   };
 
   render() {
-    const routes = this.props.routes;
-    if (!routes.ready) {
-      return null;
-    }
+    return this.props.routes.fold(
+      null,
+      () => null,
+      (routes) => {
+        const sortedRoutes: Route[] = this.map.fold(routes, (map) =>
+          sortBy(routes, (route) =>
+            getRouteDistanceInPixels(route, map.getCenter(), map)
+          )
+        );
 
-    const sortedRoutes: Route[] = this.map.fold(routes.value, map =>
-      sortBy(routes.value, route =>
-        getRouteDistanceInPixels(route, map.getCenter(), map)
-      )
-    );
-
-    return (
-      <View className="explorer" grow>
-        <SideBar
-          routes={sortedRoutes}
-          onRouteClick={this.onRouteSelect}
-          selectedRoute={this.state.selectedRoute}
-        />
-        <Map
-          routes={routes.value}
-          selectedRoute={this.state.selectedRoute}
-          hoveredRoute={this.state.hoveredRoute}
-          onRouteHover={this.onRouteHover}
-          onRouteSelect={this.onRouteSelect}
-          innerRef={map => {
-            this.map = map;
-            this.forceUpdate();
-          }}
-          startPosition="userLocation"
-        />
-      </View>
+        return (
+          <View className="explorer" grow>
+            <SideBar
+              routes={sortedRoutes}
+              onRouteClick={this.onRouteSelect}
+              selectedRoute={this.state.selectedRoute}
+            />
+            <Map
+              routes={routes}
+              selectedRoute={this.state.selectedRoute}
+              hoveredRoute={this.state.hoveredRoute}
+              onRouteHover={this.onRouteHover}
+              onRouteSelect={this.onRouteSelect}
+              innerRef={(map) => {
+                this.map = map;
+                this.forceUpdate();
+              }}
+              startPosition="userLocation"
+            />
+          </View>
+        );
+      }
     );
   }
 }

@@ -1,6 +1,6 @@
 import * as React from "react";
-import View from "View";
-import { Route } from "model";
+import View from "../View";
+import { Route } from "../../model";
 
 import "./popup.scss";
 

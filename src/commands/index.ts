@@ -1,1 +1,3 @@
-export * from './commands';
+import { doUpdateLocation } from "@buildo/bento/data";
+
+export { doUpdateLocation };

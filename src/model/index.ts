@@ -1,7 +1,7 @@
-import { HistoryLocation } from "@buildo/bento/data";
+import { HistoryLocation as HistoryLocationT } from "@buildo/bento/data";
 import { Option, fromNullable } from "fp-ts/lib/Option";
 
-export { HistoryLocation };
+export type HistoryLocation = HistoryLocationT;
 
 export type CurrentView =
   | { view: "explorer" }

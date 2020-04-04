@@ -1,2 +1,0 @@
-(window.webpackJsonpwebclient=window.webpackJsonpwebclient||[]).push([[4],{787:function(e){e.exports={locales:["en"],messages:{"Hello.hello":"Hello {name}!","Hello.warningLength":"name length must be between 6 and 50"}}}}]);
-//# sourceMappingURL=4.bundle.1628f2740377bd04c78e.js.map

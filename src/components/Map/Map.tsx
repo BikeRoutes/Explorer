@@ -1,17 +1,19 @@
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import * as ReactDOM from "react-dom";
-import throttle = require("lodash/throttle");
+import throttle from "lodash/throttle";
 import * as mapboxgl from "mapbox-gl";
-import Popup from "Popup/Popup";
-import Marker from "Marker/Marker";
-import View from "View";
+import Popup from "../Popup/Popup";
+import Marker from "../Marker/Marker";
+import View from "../View";
 import { Option, none, some } from "fp-ts/lib/Option";
-import { Route } from "model";
+import { Route } from "../../model";
 import mobileDetect from "@buildo/bento/utils/mobileDetect";
 import { identity } from "fp-ts/lib/function";
 
 import "mapbox-gl/dist/mapbox-gl.css";
+
+/* eslint-disable array-callback-return */
 
 const md = mobileDetect();
 
@@ -54,7 +56,7 @@ class App extends React.PureComponent<Props> {
   map: Option<mapboxgl.Map> = none;
   popupSelectedRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
-  positionWatch: Option<number>;
+  positionWatch: Option<number> = none;
 
   initializeMap() {
     (mapboxgl as any).accessToken =
@@ -129,8 +131,8 @@ class App extends React.PureComponent<Props> {
   }
 
   addLayers() {
-    this.map.map(map => {
-      this.props.routes.forEach(route => {
+    this.map.map((map) => {
+      this.props.routes.forEach((route) => {
         const layer: mapboxgl.Layer = {
           id: route.properties.url,
           type: "line",
@@ -158,8 +160,8 @@ class App extends React.PureComponent<Props> {
   }
 
   addMarkers() {
-    this.map.map(map => {
-      this.props.routes.forEach(route => {
+    this.map.map((map) => {
+      this.props.routes.forEach((route) => {
         const coordinates = route.geometry.coordinates[0];
 
         const element = document.createElement("div");
@@ -183,7 +185,7 @@ class App extends React.PureComponent<Props> {
       route: Route;
     };
 
-    this.map.map(map => {
+    this.map.map((map) => {
       const closestRoute: ClosestRoute = this.props.routes.reduce(
         (acc, route) => {
           const distance = getRouteDistanceInPixels(route, e.lngLat, map);
@@ -202,8 +204,8 @@ class App extends React.PureComponent<Props> {
   }, 60);
 
   updateLayers() {
-    this.map.map(map => {
-      this.props.routes.forEach(route => {
+    this.map.map((map) => {
+      this.props.routes.forEach((route) => {
         // update color
         map.setPaintProperty(route.id, "line-color", this.getRouteColor(route));
       });
@@ -211,10 +213,10 @@ class App extends React.PureComponent<Props> {
   }
 
   flyToRoute(route: Route, options?: mapboxgl.FitBoundsOptions) {
-    this.map.map(map => {
+    this.map.map((map) => {
       const coordinates = route.geometry.coordinates as [number, number][];
       const bounds = coordinates
-        .map(coord => new mapboxgl.LngLatBounds(coord, coord))
+        .map((coord) => new mapboxgl.LngLatBounds(coord, coord))
         .reduce((bounds, coord) => {
           return bounds.extend(coord);
         });
@@ -224,7 +226,7 @@ class App extends React.PureComponent<Props> {
   }
 
   showPopup(route: Route, popup: mapboxgl.Popup) {
-    this.map.map(map => {
+    this.map.map((map) => {
       const latLng: mapboxgl.LngLat = new mapboxgl.LngLat(
         route.geometry.coordinates[0][0],
         route.geometry.coordinates[0][1]
@@ -262,7 +264,7 @@ class App extends React.PureComponent<Props> {
     this.props.innerRef(this.map);
 
     this.positionWatch = some(
-      navigator.geolocation.watchPosition(position => {
+      navigator.geolocation.watchPosition((position) => {
         console.log(position);
         localStorage.setItem("start_lat", String(position.coords.latitude));
         localStorage.setItem("start_lng", String(position.coords.longitude));

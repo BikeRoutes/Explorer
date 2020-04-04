@@ -1,40 +1,57 @@
 {
-  "name": "bike-routes-web",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "bento web-dev -c ./config",
-    "build": "NODE_ENV=production bento web-build -c ./config --paths ./paths.js --webpackConfig ./webpackConfig.js",
-    "deploy": "yarn build && git add docs && git commit -m 'update github page' && git push",
-    "prettier-check": "bento prettier-check",
-    "prettier-write": "bento prettier-write"
-  },
+  "name": "explorer-cra",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@buildo/bento": "^10.0.0",
-    "classnames": "^2.2.5",
-    "es6-promise": "^4.2.2",
-    "file-saver": "^2.0.0",
+    "@buildo/bento": "^15.0.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/classnames": "^2.2.10",
+    "@types/file-saver": "^2.0.1",
+    "@types/jest": "^24.0.0",
+    "@types/lodash": "^4.14.149",
+    "@types/mapbox-gl": "^1.8.3",
+    "@types/node": "^12.0.0",
+    "@types/qs": "^6.9.1",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/remarkable": "^1.7.4",
+    "classnames": "^2.2.6",
+    "es6-promise": "^4.2.8",
+    "file-saver": "^2.0.2",
     "geojson-length": "^0.1.1",
-    "lodash": "^4.17.13",
-    "mapbox-gl": "^0.52.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "remarkable": "^1.7.1",
-    "string-to-color": "^2.0.1",
-    "togpx": "^0.5.4"
+    "gh-pages": "^2.2.0",
+    "lodash": "^4.17.15",
+    "mapbox-gl": "^1.9.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1",
+    "remarkable": "^2.0.0",
+    "string-to-color": "^2.1.3",
+    "togpx": "^0.5.4",
+    "typescript": "~3.7.2"
   },
-  "devDependencies": {
-    "@types/classnames": "^2.2.3",
-    "@types/file-saver": "^2.0.0",
-    "@types/fixed-data-table": "^0.6.32",
-    "@types/lodash": "^4.14.93",
-    "@types/mapbox-gl": "^0.51.3",
-    "@types/node": "^9.3.0",
-    "@types/qs": "^6.5.1",
-    "@types/react": "^16.0.34",
-    "@types/react-dom": "^16.0.3",
-    "@types/react-intl": "^2.3.3",
-    "@types/react-select": "^1.1.0",
-    "@types/react-transition-group": "^2.0.6",
-    "@types/remarkable": "^1.7.2"
+  "scripts": {
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build",
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "homepage": "https://bikeroutes.github.io/Explorer",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
