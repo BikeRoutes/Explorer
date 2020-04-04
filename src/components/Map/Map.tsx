@@ -265,7 +265,6 @@ class App extends React.PureComponent<Props> {
 
     this.positionWatch = some(
       navigator.geolocation.watchPosition((position) => {
-        console.log(position);
         localStorage.setItem("start_lat", String(position.coords.latitude));
         localStorage.setItem("start_lng", String(position.coords.longitude));
       })

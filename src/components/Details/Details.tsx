@@ -68,7 +68,7 @@ class Markdown extends React.PureComponent<{
               </View>
               <View className="elevation" column>
                 <span>{this.props.route.properties.elevationGain} m</span>
-                <label>Elevation</label>
+                <label>Elevation gain</label>
               </View>
             </View>
           </View>

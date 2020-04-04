@@ -5,16 +5,18 @@ import * as geoJsonLength from "geojson-length";
 import { Option, fromNullable, none, some } from "fp-ts/lib/Option";
 
 function getElevationGain(coordinates: Geometry["coordinates"]): number {
-  return coordinates.reduce((acc, c, index) => {
-    const prevAltitude = index > 0 ? coordinates[index - 1][2] : undefined;
-    const altitude = c[2];
+  return coordinates
+    .filter((c) => c[2])
+    .reduce((acc, c, index) => {
+      const prevAltitude = index > 0 ? coordinates[index - 1][2] : undefined;
+      const altitude = c[2]!;
 
-    if (altitude && prevAltitude && altitude > prevAltitude) {
-      return acc + altitude - prevAltitude;
-    }
+      if (prevAltitude && altitude > prevAltitude) {
+        return acc + altitude - prevAltitude;
+      }
 
-    return acc;
-  }, 0);
+      return acc;
+    }, 0);
 }
 
 export { location };
@@ -51,8 +53,6 @@ export const routes = Query({
               )
             }
           };
-
-          console.log(feature, richFeature);
 
           return richFeature;
         })
