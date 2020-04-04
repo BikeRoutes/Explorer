@@ -73,9 +73,11 @@ class Markdown extends React.PureComponent<{
             </View>
           </View>
           <View className="images" hAlignContent="right" shrink={false}>
-            {Array.from(images).map((image) => (
-              <img key={image.src} src={image.src} alt={image.src} />
-            ))}
+            {Array.from(images)
+              .filter((_, i) => i === 0)
+              .map((image) => (
+                <img key={image.src} src={image.src} alt={image.src} />
+              ))}
           </View>
         </View>
       </View>

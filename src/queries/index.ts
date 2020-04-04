@@ -1,6 +1,5 @@
 import { Query, location, available } from "@buildo/bento/data";
-import * as API from "../API";
-import { locationToView, Geometry, Route } from "../model";
+import { locationToView, Geometry, Route, GeoJSONFeature } from "../model";
 import * as stringToColor from "string-to-color";
 import * as geoJsonLength from "geojson-length";
 import { Option, fromNullable, none, some } from "fp-ts/lib/Option";
@@ -30,24 +29,34 @@ export const routes = Query({
   cacheStrategy: available,
   params: {},
   fetch: (): Promise<Route[]> =>
-    API.getRoutes().then((features) =>
-      features.map((feature) => {
-        const richFeature: Route = {
-          id: feature.properties.url,
-          ...feature,
-          properties: {
-            ...feature.properties,
-            color: stringToColor(feature.properties.name),
-            length: (geoJsonLength(feature.geometry) / 1000).toFixed(1),
-            elevationGain: Math.round(
-              getElevationGain(feature.geometry.coordinates)
-            )
-          }
-        };
-
-        return richFeature;
-      })
+    fetch(
+      `${
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:8081/"
+          : "http://localhost:8081/"
+      }`
     )
+      .then((res) => res.json() as Promise<GeoJSONFeature[]>)
+      .then((features) =>
+        features.map((feature) => {
+          const richFeature: Route = {
+            id: feature.properties.url,
+            ...feature,
+            properties: {
+              ...feature.properties,
+              color: stringToColor(feature.properties.name),
+              length: (geoJsonLength(feature.geometry) / 1000).toFixed(1),
+              elevationGain: Math.round(
+                getElevationGain(feature.geometry.coordinates)
+              )
+            }
+          };
+
+          console.log(feature, richFeature);
+
+          return richFeature;
+        })
+      )
 });
 
 export const route = Query({

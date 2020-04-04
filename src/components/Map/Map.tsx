@@ -286,8 +286,10 @@ class App extends React.PureComponent<Props> {
     }
   }
 
-  componentWillUnmount() {
-    this.positionWatch.map(navigator.geolocation.clearWatch);
+  UNSAFE_componentWillMount() {
+    this.positionWatch.map((positionWatch) =>
+      navigator.geolocation.clearWatch(positionWatch)
+    );
   }
 
   render() {

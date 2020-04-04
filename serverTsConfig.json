@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
+    "strict": true,
+    "pretty": true,
+    "target": "ES5"
+  },
+  "include": ["src", "typings"]
+}
