@@ -8,7 +8,9 @@ import { none } from "fp-ts/lib/Option";
 import { Route } from "../../model";
 import Button from "@buildo/bento/components/Button";
 import { saveAs } from "file-saver";
+import { Carousel } from "react-responsive-carousel";
 
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./details.scss";
 
 const togpx = require("togpx");
@@ -32,8 +34,8 @@ class Markdown extends React.PureComponent<{
   }
 
   render() {
-    const images: NodeListOf<HTMLImageElement> = document.querySelectorAll(
-      ".markdown img"
+    const images = Array.from(
+      document.querySelectorAll<HTMLImageElement>(".markdown img")
     );
 
     const h1: HTMLElement | null = document.querySelector("h1");
@@ -73,11 +75,18 @@ class Markdown extends React.PureComponent<{
             </View>
           </View>
           <View className="images" hAlignContent="right" shrink={false}>
-            {Array.from(images)
-              .filter((_, i) => i === 0)
-              .map((image) => (
+            <Carousel
+              showThumbs={false}
+              showStatus={false}
+              showIndicators={images.length > 1}
+              infiniteLoop
+              autoPlay
+              interval={6000}
+            >
+              {images.map((image) => (
                 <img key={image.src} src={image.src} alt={image.src} />
               ))}
+            </Carousel>
           </View>
         </View>
       </View>
