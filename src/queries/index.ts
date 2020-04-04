@@ -33,7 +33,7 @@ export const routes = Query({
       `${
         process.env.NODE_ENV === "development"
           ? "http://localhost:8081/"
-          : "http://localhost:8081/"
+          : "https://open-bike-routes.herokuapp.com/"
       }`
     )
       .then((res) => res.json() as Promise<GeoJSONFeature[]>)
