@@ -1,5 +1,5 @@
 .details {
-  padding: 16px 100px 0 100px;
+  padding: 16px 100px 70px 100px;
   overflow: auto;
 
   .markdown {
@@ -47,6 +47,7 @@
     }
 
     .summary {
+      padding-right: 32px;
       > div:not(:last-child) {
         margin-right: 24px;
       }
@@ -77,12 +78,17 @@
     margin: 0 -100px;
     height: 600px;
   }
+
+  .elevation-profile-wrapper {
+    padding: 32px 0;
+    height: 280px;
+  }
 }
 
 .is-phone,
 .is-tablet {
   .details {
-    padding: 16px 16px 0 16px;
+    padding: 16px 16px 48px 16px;
 
     .markdown {
       padding-bottom: 16px;
@@ -113,6 +119,10 @@
     .map-wrapper {
       margin: 0 -16px;
       height: 400px;
+    }
+
+    .elevation-profile-wrapper {
+      height: 200px;
     }
   }
 }

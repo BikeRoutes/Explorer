@@ -69,7 +69,8 @@ class App extends React.PureComponent<Props> {
         lat: parseFloat(localStorage.getItem("start_lat") || "0"),
         lng: parseFloat(localStorage.getItem("start_lng") || "0")
       },
-      zoom: 11.0
+      zoom: 11.0,
+      scrollZoom: false
     });
 
     map.on("load", () => {

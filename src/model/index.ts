@@ -49,8 +49,10 @@ export type GeoJSONFeature = {
   properties: {
     name: string;
     color: string;
-    length: string;
+    length: number;
     elevationGain: number;
+    minElevation: number;
+    maxElevation: number;
     url: string;
   };
   geometry: Geometry;

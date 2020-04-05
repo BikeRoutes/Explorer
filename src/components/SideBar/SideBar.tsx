@@ -26,8 +26,13 @@ const Route = (props: {
     <View className="distance" vAlignContent="bottom">
       <label>Distance</label> {props.route.properties.length} km
     </View>
-    <View className="elevation" vAlignContent="bottom">
-      <label>Elevation</label> {props.route.properties.elevationGain} m
+    <View className="min-elevation" vAlignContent="bottom">
+      <label>Elev (min)</label>{" "}
+      {Math.round(props.route.properties.minElevation)} m
+    </View>
+    <View className="max-elevation" vAlignContent="bottom">
+      <label>Elev (max)</label>{" "}
+      {Math.round(props.route.properties.maxElevation)} m
     </View>
 
     <View className="actions">

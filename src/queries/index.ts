@@ -41,16 +41,28 @@ export const routes = Query({
       .then((res) => res.json() as Promise<GeoJSONFeature[]>)
       .then((features) =>
         features.map((feature) => {
+          const minElevation = feature.geometry.coordinates.reduce(
+            (acc: number, c) => (c[2] && c[2] < acc ? c[2] : acc),
+            Number.MAX_SAFE_INTEGER
+          );
+
+          const maxElevation = feature.geometry.coordinates.reduce(
+            (acc: number, c) => (c[2] && c[2] > acc ? c[2] : acc),
+            Number.MIN_SAFE_INTEGER
+          );
+
           const richFeature: Route = {
             id: feature.properties.url,
             ...feature,
             properties: {
               ...feature.properties,
               color: stringToColor(feature.properties.name),
-              length: (geoJsonLength(feature.geometry) / 1000).toFixed(1),
+              length: Math.round(geoJsonLength(feature.geometry) / 100) / 10,
               elevationGain: Math.round(
                 getElevationGain(feature.geometry.coordinates)
-              )
+              ),
+              minElevation,
+              maxElevation
             }
           };
 
