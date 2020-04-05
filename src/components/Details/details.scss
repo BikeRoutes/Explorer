@@ -68,9 +68,15 @@
       width: 30%;
       padding-top: 32px;
 
-      img {
-        height: 200px;
+      .carousel {
+        img {
+          height: 200px;
+        }
       }
+    }
+
+    .mobile-images {
+      display: none !important;
     }
   }
 
@@ -104,13 +110,21 @@
         }
 
         .images {
-          width: unset;
-          margin-top: 28px;
-          justify-content: flex-start !important;
+          display: none !important;
+        }
 
-          img {
+        .mobile-images {
+          display: flex !important;
+          margin-top: 28px;
+
+          > img {
             margin-top: 0;
             height: 100px;
+            display: unset;
+
+            &:not(:first-child) {
+              margin-left: 20px;
+            }
           }
         }
       }

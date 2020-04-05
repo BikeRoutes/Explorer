@@ -101,6 +101,11 @@ class Markdown extends React.PureComponent<{
               ))}
             </Carousel>
           </View>
+          <View className="mobile-images" grow>
+            {images.slice(0, 2).map((image) => (
+              <img key={image.src} src={image.src} alt={image.src} />
+            ))}
+          </View>
         </View>
       </View>
     );
