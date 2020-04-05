@@ -260,9 +260,19 @@ class App extends React.PureComponent<Props> {
     }
   }
 
+  onFullscreenChange = () => {
+    if (document.fullscreenElement) {
+      this.map.map((map) => map.scrollZoom.enable());
+    } else {
+      this.map.map((map) => map.scrollZoom.disable());
+    }
+  };
+
   componentDidMount() {
     this.initializeMap();
     this.props.innerRef(this.map);
+
+    document.addEventListener("fullscreenchange", this.onFullscreenChange);
 
     this.positionWatch = some(
       navigator.geolocation.watchPosition((position) => {
@@ -290,6 +300,10 @@ class App extends React.PureComponent<Props> {
     this.positionWatch.map((positionWatch) =>
       navigator.geolocation.clearWatch(positionWatch)
     );
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
   }
 
   render() {
