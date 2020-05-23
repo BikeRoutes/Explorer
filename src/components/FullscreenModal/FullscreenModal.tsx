@@ -7,11 +7,21 @@ import "@buildo/bento/components/modal.scss";
 
 type Props = {};
 
-type State = {};
+type State = {
+  showModal: boolean;
+};
 
 let fullscreen: boolean = false;
+let documentHidden: { time: number; value: boolean } = {
+  time: 0,
+  value: false
+};
 
 export default class FullscreenModal extends React.PureComponent<Props, State> {
+  state: State = {
+    showModal: false
+  };
+
   onFullscreenChange = () => {
     if (document.fullscreenElement) {
       fullscreen = true;
@@ -23,11 +33,22 @@ export default class FullscreenModal extends React.PureComponent<Props, State> {
   };
 
   onVisibilityChange = () => {
-    if (!document.hidden) {
+    if (
+      Date.now() > documentHidden.time + 300 &&
+      documentHidden.value &&
+      !document.hidden
+    ) {
       if (fullscreen) {
-        this.forceUpdate();
+        this.setState({
+          showModal: true
+        });
       }
     }
+
+    documentHidden = {
+      time: Date.now(),
+      value: document.hidden
+    };
   };
 
   enterFullscreen = () => {
@@ -50,11 +71,13 @@ export default class FullscreenModal extends React.PureComponent<Props, State> {
 
   onDismiss = () => {
     fullscreen = false;
-    this.forceUpdate();
+    this.setState({
+      showModal: false
+    });
   };
 
   render() {
-    return fullscreen ? (
+    return this.state.showModal ? (
       <Modal
         className="fullscreenModal"
         transitionEnterTimeout={500}

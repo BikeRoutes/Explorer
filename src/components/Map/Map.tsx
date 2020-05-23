@@ -6,7 +6,7 @@ import * as mapboxgl from "mapbox-gl";
 import Popup from "../Popup/Popup";
 import Marker from "../Marker/Marker";
 import View from "../View";
-import { Option, none, some } from "fp-ts/lib/Option";
+import { Option, none, some, fromNullable } from "fp-ts/lib/Option";
 import { Route } from "../../model";
 import mobileDetect from "@buildo/bento/utils/mobileDetect";
 import { identity } from "fp-ts/lib/function";
@@ -139,8 +139,8 @@ class App extends React.PureComponent<Props> {
   }
 
   addLayers() {
-    this.map.map((map) => {
-      this.props.routes.forEach((route) => {
+    this.map.map(map => {
+      this.props.routes.forEach(route => {
         const layer: mapboxgl.Layer = {
           id: route.properties.url,
           type: "line",
@@ -168,8 +168,8 @@ class App extends React.PureComponent<Props> {
   }
 
   addMarkers() {
-    this.map.map((map) => {
-      this.props.routes.forEach((route) => {
+    this.map.map(map => {
+      this.props.routes.forEach(route => {
         const coordinates = route.geometry.coordinates[0];
 
         const element = document.createElement("div");
@@ -193,7 +193,7 @@ class App extends React.PureComponent<Props> {
       route: Route;
     };
 
-    this.map.map((map) => {
+    this.map.map(map => {
       const closestRoute: ClosestRoute = this.props.routes.reduce(
         (acc, route) => {
           const distance = getRouteDistanceInPixels(route, e.lngLat, map);
@@ -212,8 +212,8 @@ class App extends React.PureComponent<Props> {
   }, 60);
 
   updateLayers() {
-    this.map.map((map) => {
-      this.props.routes.forEach((route) => {
+    this.map.map(map => {
+      this.props.routes.forEach(route => {
         // update color
         map.setPaintProperty(route.id, "line-color", this.getRouteColor(route));
       });
@@ -221,10 +221,10 @@ class App extends React.PureComponent<Props> {
   }
 
   flyToRoute(route: Route, options?: mapboxgl.FitBoundsOptions) {
-    this.map.map((map) => {
+    this.map.map(map => {
       const coordinates = route.geometry.coordinates as [number, number][];
       const bounds = coordinates
-        .map((coord) => new mapboxgl.LngLatBounds(coord, coord))
+        .map(coord => new mapboxgl.LngLatBounds(coord, coord))
         .reduce((bounds, coord) => {
           return bounds.extend(coord);
         });
@@ -234,7 +234,7 @@ class App extends React.PureComponent<Props> {
   }
 
   showPopup(route: Route, popup: mapboxgl.Popup) {
-    this.map.map((map) => {
+    this.map.map(map => {
       const latLng: mapboxgl.LngLat = new mapboxgl.LngLat(
         route.geometry.coordinates[0][0],
         route.geometry.coordinates[0][1]
@@ -269,10 +269,10 @@ class App extends React.PureComponent<Props> {
 
   onFullscreenChange = () => {
     if (document.fullscreenElement) {
-      this.map.map((map) => map.scrollZoom.enable());
+      this.map.map(map => map.scrollZoom.enable());
       this.centerUserLocation();
     } else {
-      this.map.map((map) => map.scrollZoom.disable());
+      this.map.map(map => map.scrollZoom.disable());
     }
   };
 
@@ -283,7 +283,7 @@ class App extends React.PureComponent<Props> {
     document.addEventListener("fullscreenchange", this.onFullscreenChange);
 
     this.positionWatch = some(
-      navigator.geolocation.watchPosition((position) => {
+      navigator.geolocation.watchPosition(position => {
         localStorage.setItem("start_lat", String(position.coords.latitude));
         localStorage.setItem("start_lng", String(position.coords.longitude));
       })
@@ -305,7 +305,7 @@ class App extends React.PureComponent<Props> {
   }
 
   UNSAFE_componentWillMount() {
-    this.positionWatch.map((positionWatch) =>
+    this.positionWatch.map(positionWatch =>
       navigator.geolocation.clearWatch(positionWatch)
     );
   }
