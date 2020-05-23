@@ -17,6 +17,8 @@ import FullscreenModal from "../FullscreenModal/FullscreenModal";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./details.scss";
 
+const { linkify } = require("remarkable/linkify");
+
 defaults.global.animation = 0;
 
 const togpx = require("togpx");
@@ -138,9 +140,7 @@ class Markdown extends React.PureComponent<{
   }
 }
 
-const md = new (Remarkable as any)({
-  linkify: true
-});
+const md = new (Remarkable as any)().use(linkify);
 
 const queries = declareQueries({ route, routeReadme });
 
