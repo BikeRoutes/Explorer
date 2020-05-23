@@ -59,6 +59,12 @@ class App extends React.PureComponent<Props> {
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   positionWatch: Option<number> = none;
 
+  centerUserLocation = () => {
+    document
+      .querySelector<HTMLButtonElement>(".mapboxgl-ctrl-geolocate")!
+      .click();
+  };
+
   initializeMap() {
     (mapboxgl as any).accessToken =
       "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThyejR6ODA2ZDk0M25rZzZjcGo4ZmcifQ.yRWHQbG1dJjDp43d01bBOw";
@@ -81,9 +87,7 @@ class App extends React.PureComponent<Props> {
       this.addMarkers();
 
       if (this.props.startPosition === "userLocation") {
-        document
-          .querySelector<HTMLButtonElement>(".mapboxgl-ctrl-geolocate")!
-          .click();
+        this.centerUserLocation();
       }
 
       if (
@@ -264,6 +268,7 @@ class App extends React.PureComponent<Props> {
   onFullscreenChange = () => {
     if (document.fullscreenElement) {
       this.map.map((map) => map.scrollZoom.enable());
+      this.centerUserLocation();
     } else {
       this.map.map((map) => map.scrollZoom.disable());
     }
