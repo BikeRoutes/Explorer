@@ -13,10 +13,12 @@ import { Line, defaults } from "react-chartjs-2";
 import * as geoJsonLength from "geojson-length";
 import uniq from "lodash/uniq";
 import FullscreenModal from "../FullscreenModal/FullscreenModal";
+import NoSleep from "nosleep.js";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./details.scss";
 
+const noSleep = new NoSleep();
 const { linkify } = require("remarkable/linkify");
 
 defaults.global.animation = 0;
@@ -209,12 +211,14 @@ class Details extends React.Component<Props, State> {
                   <Markdown
                     routeReadme={routeReadme.value}
                     route={route.value}
-                    onEnterNavigation={() =>
-                      this.setState({ navigating: true })
-                    }
-                    onExitNavigation={() =>
-                      this.setState({ navigating: false })
-                    }
+                    onEnterNavigation={() => {
+                      noSleep.enable();
+                      this.setState({ navigating: true });
+                    }}
+                    onExitNavigation={() => {
+                      noSleep.disable();
+                      this.setState({ navigating: false });
+                    }}
                     navigating={this.state.navigating}
                   />
 
