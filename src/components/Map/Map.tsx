@@ -60,9 +60,11 @@ class App extends React.PureComponent<Props> {
   positionWatch: Option<number> = none;
 
   centerUserLocation = () => {
-    document
-      .querySelector<HTMLButtonElement>(".mapboxgl-ctrl-geolocate")!
-      .click();
+    fromNullable(
+      document.querySelector<HTMLButtonElement>(
+        ".mapboxgl-ctrl-geolocate:not(.mapboxgl-ctrl-geolocate-active)"
+      )
+    ).map(el => el.click());
   };
 
   initializeMap() {
