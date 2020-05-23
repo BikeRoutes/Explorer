@@ -3,7 +3,8 @@
     "lib": ["ESNext", "DOM"],
     "strict": true,
     "pretty": true,
-    "target": "ES5"
+    "target": "ES5",
+    "outDir": "./serverBuild"
   },
-  "include": ["src", "typings"]
+  "include": ["server"]
 }

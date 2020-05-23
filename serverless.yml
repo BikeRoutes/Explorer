@@ -1,0 +1,17 @@
+service: bikeroutes
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 128
+  profile: AWS-LAMBDA
+
+functions:
+  githubWebhookListener:
+    handler: serverBuild/server/server.getRoutesListener
+    events:
+      - http:
+          path: /
+          method: get
+          integration: lambda
+          cors: true

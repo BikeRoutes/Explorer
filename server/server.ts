@@ -1,15 +1,20 @@
-import * as express from "express";
-import * as cors from "cors";
 import { getRoutes } from "./getRoutes";
 
-const app = express();
+type Response = {
+  statusCode: number;
+  body: string;
+};
 
-app.use(cors());
-
-app.get("/", async (_, res) => {
-  const routes = await getRoutes();
-
-  res.json(routes);
-});
-
-app.listen(process.env.PORT || 8081);
+export const getRoutesListener = (): Promise<Response> => {
+  return getRoutes()
+    .then(routes => {
+      return {
+        body: JSON.stringify(routes),
+        statusCode: 200
+      };
+    })
+    .catch(() => ({
+      statusCode: 500,
+      body: "[]"
+    }));
+};

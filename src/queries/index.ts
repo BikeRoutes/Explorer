@@ -6,7 +6,7 @@ import { Option, fromNullable, none, some } from "fp-ts/lib/Option";
 
 function getElevationGain(coordinates: Geometry["coordinates"]): number {
   return coordinates
-    .filter((c) => c[2])
+    .filter(c => c[2])
     .reduce((acc, c, index) => {
       const prevAltitude = index > 0 ? coordinates[index - 1][2] : undefined;
       const altitude = c[2]!;
@@ -35,12 +35,13 @@ export const routes = Query({
       `${
         process.env.NODE_ENV === "development"
           ? "http://localhost:8081/"
-          : "https://open-bike-routes.herokuapp.com/"
+          : "https://or52hotxz1.execute-api.us-east-1.amazonaws.com/dev/"
       }`
     )
-      .then((res) => res.json() as Promise<GeoJSONFeature[]>)
-      .then((features) =>
-        features.map((feature) => {
+      .then(res => res.json() as Promise<{ body: string }>)
+      .then((res): GeoJSONFeature[] => JSON.parse(res.body))
+      .then(features =>
+        features.map(feature => {
           const minElevation = feature.geometry.coordinates.reduce(
             (acc: number, c) => (c[2] && c[2] < acc ? c[2] : acc),
             Number.MAX_SAFE_INTEGER
@@ -77,9 +78,7 @@ export const route = Query({
   fetch: ({ currentView, routes }): Promise<Option<Route>> => {
     if (currentView.view === "details" && currentView.routeId.isSome()) {
       const routeId = currentView.routeId.value;
-      return Promise.resolve(
-        fromNullable(routes.find((r) => r.id === routeId))
-      );
+      return Promise.resolve(fromNullable(routes.find(r => r.id === routeId)));
     }
 
     return Promise.resolve(none);
@@ -98,8 +97,8 @@ export const routeReadme = Query({
       const readmeUrl = `https://raw.githubusercontent.com/BikeRoutes/BikeRoutes/master/${res[1]}/README.md`;
 
       return fetch(readmeUrl)
-        .then((r) => r.text())
-        .then((text) => some(text));
+        .then(r => r.text())
+        .then(text => some(text));
     }
     return Promise.resolve(none);
   }
