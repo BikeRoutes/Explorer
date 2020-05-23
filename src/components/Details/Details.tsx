@@ -182,8 +182,8 @@ class Details extends React.Component<Props> {
                     <Map
                       routes={[route.value]}
                       startPosition="firstRoute"
+                      hoveredRoute={route} // fixed blue color that is easily visible
                       // fake props
-                      hoveredRoute={none}
                       selectedRoute={none}
                       onRouteHover={() => {}}
                       onRouteSelect={() => {}}
