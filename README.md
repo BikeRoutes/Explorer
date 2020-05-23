@@ -27,3 +27,7 @@ The build is minified and the filenames include the hashes.<br />
 
 Runs `yarn build` and then pushes the built app on the gh-pages branch.<br />
 The web application is automatically updated by GitHub in a couple of minutes.
+
+## Credits
+
+[Bike Routes logo by Vecteezy](https://www.vecteezy.com/free-vector/bike-logo)
