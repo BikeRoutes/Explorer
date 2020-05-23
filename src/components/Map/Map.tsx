@@ -10,6 +10,7 @@ import { Option, none, some, fromNullable } from "fp-ts/lib/Option";
 import { Route } from "../../model";
 import mobileDetect from "@buildo/bento/utils/mobileDetect";
 import { identity } from "fp-ts/lib/function";
+import cx from "classnames";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.scss";
@@ -51,6 +52,7 @@ type Props = {
   onRouteSelect: (route: Route) => void;
   innerRef: (map: Option<mapboxgl.Map>) => void;
   startPosition: "userLocation" | "firstRoute";
+  navigating: boolean;
 };
 
 class App extends React.PureComponent<Props> {
@@ -106,7 +108,7 @@ class App extends React.PureComponent<Props> {
 
     map.on("moveend", () => this.props.innerRef(this.map));
 
-    map.addControl(new mapboxgl.FullscreenControl());
+    // map.addControl(new mapboxgl.FullscreenControl());
 
     map.addControl(
       new mapboxgl.GeolocateControl({
@@ -304,6 +306,12 @@ class App extends React.PureComponent<Props> {
     ) {
       this.flyToRoute(this.props.selectedRoute.value);
     }
+
+    if (this.props.navigating) {
+      this.centerUserLocation();
+    }
+
+    setTimeout(() => this.map.map(map => map.resize()), 30);
   }
 
   UNSAFE_componentWillMount() {
@@ -317,7 +325,13 @@ class App extends React.PureComponent<Props> {
   }
 
   render() {
-    return <View grow id="map" />;
+    return (
+      <View
+        grow
+        id="map"
+        className={cx({ isNavigating: this.props.navigating })}
+      />
+    );
   }
 }
 

@@ -34,6 +34,9 @@ const saveGPX = (route: Route): void => {
 class Markdown extends React.PureComponent<{
   routeReadme: string;
   route: Route;
+  navigating: boolean;
+  onEnterNavigation: () => void;
+  onExitNavigation: () => void;
 }> {
   componentDidMount() {
     this.forceUpdate();
@@ -41,22 +44,44 @@ class Markdown extends React.PureComponent<{
 
   render() {
     const images = Array.from(
-      document.querySelectorAll<HTMLImageElement>(".markdown img")
+      document.querySelectorAll<HTMLImageElement>(".remarkable img")
     );
 
-    const h1: HTMLElement | null = document.querySelector("h1");
+    const h1 = document.querySelector<HTMLElement>(
+      ".remarkable h1:first-of-type"
+    );
 
     return (
       <View className="markdown" hAlignContent="center" shrink={false}>
+        {this.props.navigating && (
+          <View
+            className="exit-navigation"
+            onClick={this.props.onExitNavigation}
+            hAlignContent="center"
+            vAlignContent="center"
+          >
+            <svg width="29" height="29" viewBox="0 0 29 29">
+              <path
+                fill="black"
+                d="M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z"
+              ></path>
+            </svg>
+          </View>
+        )}
+
         <View className="wrapper" grow>
           <View grow column style={{ position: "relative" }}>
-            <View
-              className="actions"
-              style={{ left: h1 ? h1.clientWidth : undefined }}
-            >
+            <View className="title">{h1?.innerText}</View>
+            <View className="actions">
               <Button
                 flat
-                size="tiny"
+                size="medium"
+                label="Enter Navigation"
+                onClick={this.props.onEnterNavigation}
+              />
+              <Button
+                flat
+                size="medium"
                 label="Download GPX"
                 onClick={() => saveGPX(this.props.route)}
               />
@@ -97,13 +122,13 @@ class Markdown extends React.PureComponent<{
               autoPlay
               interval={6000}
             >
-              {images.map((image) => (
+              {images.map(image => (
                 <img key={image.src} src={image.src} alt={image.src} />
               ))}
             </Carousel>
           </View>
           <View className="mobile-images" grow>
-            {images.slice(0, 2).map((image) => (
+            {images.slice(0, 2).map(image => (
               <img key={image.src} src={image.src} alt={image.src} />
             ))}
           </View>
@@ -121,16 +146,24 @@ const queries = declareQueries({ route, routeReadme });
 
 type Props = typeof queries.Props;
 
-class Details extends React.Component<Props> {
+type State = {
+  navigating: boolean;
+};
+
+class Details extends React.Component<Props, State> {
+  state: State = {
+    navigating: false
+  };
+
   render() {
     return this.props.route.fold(
       null,
       () => null,
-      (route) =>
+      route =>
         this.props.routeReadme.fold(
           null,
           () => null,
-          (routeReadme) => {
+          routeReadme => {
             if (route.isNone() || routeReadme.isNone()) {
               return null;
             } else {
@@ -163,9 +196,9 @@ class Details extends React.Component<Props> {
                   }) / 1000
               );
 
-              const ticks = uniq(distances.map((d) => round(d, scale)));
+              const ticks = uniq(distances.map(d => round(d, scale)));
 
-              const elevations = route.value.geometry.coordinates.map((c) =>
+              const elevations = route.value.geometry.coordinates.map(c =>
                 c[2] ? Math.round(c[2]) : null
               );
 
@@ -176,12 +209,20 @@ class Details extends React.Component<Props> {
                   <Markdown
                     routeReadme={routeReadme.value}
                     route={route.value}
+                    onEnterNavigation={() =>
+                      this.setState({ navigating: true })
+                    }
+                    onExitNavigation={() =>
+                      this.setState({ navigating: false })
+                    }
+                    navigating={this.state.navigating}
                   />
 
                   <View shrink={false} className="map-wrapper">
                     <Map
                       routes={[route.value]}
                       startPosition="firstRoute"
+                      navigating={this.state.navigating}
                       hoveredRoute={route} // fixed blue color that is easily visible
                       // fake props
                       selectedRoute={none}
@@ -216,7 +257,7 @@ class Details extends React.Component<Props> {
                             {
                               id: "x-axis-hidden",
                               type: "category",
-                              labels: distances.map((d) => d.toFixed(1)),
+                              labels: distances.map(d => d.toFixed(1)),
                               display: false
                             },
                             {

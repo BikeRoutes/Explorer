@@ -47,9 +47,9 @@ class Explorer extends React.Component<Props, State> {
     return this.props.routes.fold(
       null,
       () => null,
-      (routes) => {
-        const sortedRoutes: Route[] = this.map.fold(routes, (map) =>
-          sortBy(routes, (route) =>
+      routes => {
+        const sortedRoutes: Route[] = this.map.fold(routes, map =>
+          sortBy(routes, route =>
             getRouteDistanceInPixels(route, map.getCenter(), map)
           )
         );
@@ -67,11 +67,12 @@ class Explorer extends React.Component<Props, State> {
               hoveredRoute={this.state.hoveredRoute}
               onRouteHover={this.onRouteHover}
               onRouteSelect={this.onRouteSelect}
-              innerRef={(map) => {
+              innerRef={map => {
                 this.map = map;
                 this.forceUpdate();
               }}
               startPosition="userLocation"
+              navigating={false}
             />
           </View>
         );
