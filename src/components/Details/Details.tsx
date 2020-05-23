@@ -12,6 +12,7 @@ import { Carousel } from "react-responsive-carousel";
 import { Line, defaults } from "react-chartjs-2";
 import * as geoJsonLength from "geojson-length";
 import uniq from "lodash/uniq";
+import FullscreenModal from "../FullscreenModal/FullscreenModal";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./details.scss";
@@ -170,6 +171,8 @@ class Details extends React.Component<Props> {
 
               return (
                 <View className="details" height="100%" grow column>
+                  <FullscreenModal />
+
                   <Markdown
                     routeReadme={routeReadme.value}
                     route={route.value}

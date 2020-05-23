@@ -12,6 +12,7 @@ import mobileDetect from "@buildo/bento/utils/mobileDetect";
 import { identity } from "fp-ts/lib/function";
 
 import "mapbox-gl/dist/mapbox-gl.css";
+import "./map.scss";
 
 /* eslint-disable array-callback-return */
 
