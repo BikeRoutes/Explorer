@@ -28,7 +28,7 @@ const popupSettings: mapboxgl.PopupOptions = {
 
 export const getRouteDistanceInPixels = (
   route: Route,
-  lngLat: mapboxgl.LngLat,
+  lngLat: { lng: number; lat: number },
   map: mapboxgl.Map
 ): number => {
   return route.geometry.coordinates.reduce((acc, coordinates) => {
@@ -75,7 +75,8 @@ class App extends React.PureComponent<Props> {
 
     const map = new mapboxgl.Map({
       container: "map",
-      style: "mapbox://styles/francescocioria/cjqi3u6lmame92rmw6aw3uyhm",
+      style:
+        "mapbox://styles/francescocioria/cjqi3u6lmame92rmw6aw3uyhm?optimize=true",
       center: {
         lat: parseFloat(localStorage.getItem("start_lat") || "0"),
         lng: parseFloat(localStorage.getItem("start_lng") || "0")
@@ -210,10 +211,12 @@ class App extends React.PureComponent<Props> {
       if (closestRoute.distance < 25) {
         this.props.onRouteHover(some(closestRoute.route));
       } else {
-        this.props.onRouteHover(none);
+        this.props.hoveredRoute.map(() => {
+          this.props.onRouteHover(none);
+        });
       }
     });
-  }, 60);
+  }, 100);
 
   updateLayers() {
     this.map.map(map => {

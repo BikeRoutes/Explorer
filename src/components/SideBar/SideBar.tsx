@@ -49,7 +49,7 @@ type Props = typeof commands.Props & {
   selectedRoute: Option<RouteT>;
 };
 
-class SideBar extends React.Component<Props> {
+class SideBar extends React.PureComponent<Props> {
   render() {
     return (
       <View className="side-bar" column shrink={false}>
@@ -63,7 +63,7 @@ class SideBar extends React.Component<Props> {
               this.props.selectedRoute.isSome() &&
               this.props.selectedRoute.value === route
             }
-            onDetailsClick={(e) => {
+            onDetailsClick={e => {
               e.stopPropagation();
               this.props.doUpdateLocation(
                 viewToLocation({ view: "details", routeId: some(route.id) })
