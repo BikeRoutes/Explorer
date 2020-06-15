@@ -5,13 +5,19 @@ export type HistoryLocation = HistoryLocationT;
 
 export type CurrentView =
   | { view: "explorer" }
-  | { view: "details"; routeId: Option<string> };
+  | { view: "details"; routeId: Option<string> }
+  | { view: "navigation"; routeId: Option<string> };
 
 export function locationToView(location: HistoryLocation): CurrentView {
   switch (location.search.view) {
     case "details":
       return {
         view: "details",
+        routeId: fromNullable(location.search.routeId)
+      };
+    case "navigation":
+      return {
+        view: "navigation",
         routeId: fromNullable(location.search.routeId)
       };
     default:
@@ -25,6 +31,11 @@ export function viewToLocation(view: CurrentView): HistoryLocation {
       return {
         pathname: "/Explorer",
         search: { view: "details", routeId: view.routeId.getOrElse("") }
+      };
+    case "navigation":
+      return {
+        pathname: "/Explorer",
+        search: { view: "navigation", routeId: view.routeId.getOrElse("") }
       };
     case "explorer":
       return { pathname: "/Explorer", search: {} };

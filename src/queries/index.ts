@@ -76,7 +76,10 @@ export const route = Query({
   params: {},
   dependencies: { currentView, routes },
   fetch: ({ currentView, routes }): Promise<Option<Route>> => {
-    if (currentView.view === "details" && currentView.routeId.isSome()) {
+    if (
+      (currentView.view === "details" || currentView.view === "navigation") &&
+      currentView.routeId.isSome()
+    ) {
       const routeId = currentView.routeId.value;
       return Promise.resolve(fromNullable(routes.find(r => r.id === routeId)));
     }

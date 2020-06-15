@@ -4,6 +4,7 @@ import { currentView } from "../../queries";
 import View from "../View";
 import Explorer from "../Explorer/Explorer";
 import Details from "../Details/Details";
+import Navigation from "../Navigation/Navigation";
 
 const queries = declareQueries({ currentView });
 
@@ -14,10 +15,11 @@ class App extends React.Component<Props> {
     return this.props.currentView.fold(
       null,
       () => null,
-      (currentView) => (
+      currentView => (
         <View className="app" height="100%">
           {currentView.view === "explorer" && <Explorer />}
           {currentView.view === "details" && <Details />}
+          {currentView.view === "navigation" && <Navigation />}
         </View>
       )
     );

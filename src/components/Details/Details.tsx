@@ -4,21 +4,20 @@ import { route, routeReadme } from "../../queries";
 import View from "../View";
 import Map from "../Map/Map";
 import * as RemarkableModule from "remarkable";
-import { none } from "fp-ts/lib/Option";
-import { Route } from "../../model";
+import { none, some } from "fp-ts/lib/Option";
+import { Route, viewToLocation } from "../../model";
 import Button from "@buildo/bento/components/Button";
 import { saveAs } from "file-saver";
 import { Carousel } from "react-responsive-carousel";
 import { Line, defaults } from "react-chartjs-2";
 import * as geoJsonLength from "geojson-length";
 import uniq from "lodash/uniq";
-import FullscreenModal from "../FullscreenModal/FullscreenModal";
-import NoSleep from "nosleep.js";
+import { declareCommands } from "react-avenger";
+import { doUpdateLocation } from "../../commands";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./details.scss";
 
-const noSleep = new NoSleep();
 const { linkify } = require("remarkable/linkify");
 
 defaults.global.animation = 0;
@@ -38,9 +37,7 @@ const saveGPX = (route: Route): void => {
 class Markdown extends React.PureComponent<{
   routeReadme: string;
   route: Route;
-  navigating: boolean;
   onEnterNavigation: () => void;
-  onExitNavigation: () => void;
 }> {
   componentDidMount() {
     this.forceUpdate();
@@ -57,22 +54,6 @@ class Markdown extends React.PureComponent<{
 
     return (
       <View className="markdown" hAlignContent="center" shrink={false}>
-        {this.props.navigating && (
-          <View
-            className="exit-navigation"
-            onClick={this.props.onExitNavigation}
-            hAlignContent="center"
-            vAlignContent="center"
-          >
-            <svg width="29" height="29" viewBox="0 0 29 29">
-              <path
-                fill="black"
-                d="M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z"
-              ></path>
-            </svg>
-          </View>
-        )}
-
         <View className="wrapper" grow>
           <View grow column style={{ position: "relative" }}>
             <View className="title">{h1?.innerText}</View>
@@ -145,18 +126,11 @@ class Markdown extends React.PureComponent<{
 const md = new (Remarkable as any)().use(linkify);
 
 const queries = declareQueries({ route, routeReadme });
+const commands = declareCommands({ doUpdateLocation });
 
-type Props = typeof queries.Props;
+type Props = typeof queries.Props & typeof commands.Props;
 
-type State = {
-  navigating: boolean;
-};
-
-class Details extends React.Component<Props, State> {
-  state: State = {
-    navigating: false
-  };
-
+class Details extends React.Component<Props> {
   render() {
     return this.props.route.fold(
       null,
@@ -206,27 +180,24 @@ class Details extends React.Component<Props, State> {
 
               return (
                 <View className="details" height="100%" grow column>
-                  <FullscreenModal />
-
                   <Markdown
                     routeReadme={routeReadme.value}
                     route={route.value}
                     onEnterNavigation={() => {
-                      noSleep.enable();
-                      this.setState({ navigating: true });
+                      this.props.doUpdateLocation(
+                        viewToLocation({
+                          view: "navigation",
+                          routeId: some(route.value.id)
+                        })
+                      );
                     }}
-                    onExitNavigation={() => {
-                      noSleep.disable();
-                      this.setState({ navigating: false });
-                    }}
-                    navigating={this.state.navigating}
                   />
 
                   <View shrink={false} className="map-wrapper">
                     <Map
                       routes={[route.value]}
                       startPosition="firstRoute"
-                      navigating={this.state.navigating}
+                      navigating={false}
                       hoveredRoute={route} // fixed blue color that is easily visible
                       // fake props
                       selectedRoute={none}
@@ -323,4 +294,4 @@ class Details extends React.Component<Props, State> {
   }
 }
 
-export default queries(Details);
+export default commands(queries(Details));
