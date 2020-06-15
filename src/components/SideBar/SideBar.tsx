@@ -53,24 +53,48 @@ class SideBar extends React.PureComponent<Props> {
   render() {
     return (
       <View className="side-bar" column shrink={false}>
-        <h2>Routes</h2>
-        {this.props.routes.map((route, index) => (
-          <Route
-            key={index}
-            route={route}
-            onClick={() => this.props.onRouteClick(route)}
-            isSelected={
-              this.props.selectedRoute.isSome() &&
-              this.props.selectedRoute.value === route
-            }
-            onDetailsClick={e => {
-              e.stopPropagation();
-              this.props.doUpdateLocation(
-                viewToLocation({ view: "details", routeId: some(route.id) })
-              );
+        <View column shrink={false} className="navigationGpx">
+          <h2>Navigation (GPX)</h2>
+
+          <input
+            type="file"
+            accept=".gpx"
+            onChange={e => {
+              const file = e.target.files![0];
+
+              const reader = new FileReader();
+              reader.addEventListener("load", event => {
+                (window as any).gpxFile = event.target!.result;
+
+                this.props.doUpdateLocation(
+                  viewToLocation({ view: "navigation", routeId: some("gpx") })
+                );
+              });
+              reader.readAsText(file);
             }}
           />
-        ))}
+        </View>
+
+        <View column shrink={false} className="routes">
+          <h2>Routes</h2>
+          {this.props.routes.map((route, index) => (
+            <Route
+              key={index}
+              route={route}
+              onClick={() => this.props.onRouteClick(route)}
+              isSelected={
+                this.props.selectedRoute.isSome() &&
+                this.props.selectedRoute.value === route
+              }
+              onDetailsClick={e => {
+                e.stopPropagation();
+                this.props.doUpdateLocation(
+                  viewToLocation({ view: "details", routeId: some(route.id) })
+                );
+              }}
+            />
+          ))}
+        </View>
       </View>
     );
   }

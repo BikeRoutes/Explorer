@@ -10,38 +10,50 @@
     margin-bottom: 8px;
   }
 
-  .route {
-    border-bottom: 1px solid #eaeaea;
-    padding: 16px 26px;
-    cursor: pointer;
+  .navigationGpx {
+    margin-bottom: 32px;
 
-    &:hover,
-    &.is-selected {
-      background: #f5f5f5;
+    input {
+      margin-top: 8px;
+      margin-left: 26px;
+      margin-right: 26px;
     }
+  }
 
-    .name {
-      font-size: 17px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+  .routes {
+    .route {
+      border-bottom: 1px solid #eaeaea;
+      padding: 16px 26px;
+      cursor: pointer;
 
-    .distance,
-    .min-elevation,
-    .max-elevation {
-      label {
-        color: #666;
-        width: 70px;
-        font-size: 13px;
+      &:hover,
+      &.is-selected {
+        background: #f5f5f5;
+      }
+
+      .name {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .distance,
+      .min-elevation,
+      .max-elevation {
+        label {
+          color: #666;
+          width: 70px;
+          font-size: 13px;
+          font-weight: 400;
+        }
+
+        font-size: 15px;
         font-weight: 400;
       }
 
-      font-size: 15px;
-      font-weight: 400;
-    }
-
-    .actions {
-      margin-top: 16px;
+      .actions {
+        margin-top: 16px;
+      }
     }
   }
 }
@@ -53,29 +65,51 @@
     width: 100%;
     padding: 0;
 
-    h2 {
-      display: none;
+    .navigationGpx {
+      margin-bottom: 0;
+      width: 200px;
+      padding-top: 12px;
+
+      h2 {
+        font-size: 16px;
+      }
+
+      input {
+        margin-top: 8px;
+        margin-left: 26px;
+        margin-right: 26px;
+      }
+
+      border-right: 1px solid #eaeaea;
     }
 
-    .route {
-      border-bottom: none;
-      width: 260px;
-      height: 160px;
+    .routes {
+      flex-direction: row !important;
 
-      &:not(:last-child) {
-        border-right: 1px solid #eaeaea;
+      h2 {
+        display: none;
       }
 
-      &:hover {
-        background: unset;
-      }
+      .route {
+        border-bottom: none;
+        width: 260px;
+        height: 160px;
 
-      &.is-selected {
-        background: #f5f5f5;
-      }
+        &:not(:last-child) {
+          border-right: 1px solid #eaeaea;
+        }
 
-      .actions {
-        margin-top: auto;
+        &:hover {
+          background: unset;
+        }
+
+        &.is-selected {
+          background: #f5f5f5;
+        }
+
+        .actions {
+          margin-top: auto;
+        }
       }
     }
   }

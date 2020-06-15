@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@mapbox/togeojson": "^0.16.0",
     "fp-ts": "^1.19.5",
     "graphql-request": "^1.8.2",
     "io-ts": "1.10.4"

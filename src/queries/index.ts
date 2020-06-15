@@ -1,8 +1,16 @@
 import { Query, location, available } from "@buildo/bento/data";
-import { locationToView, Geometry, Route, GeoJSONFeature } from "../model";
+import {
+  locationToView,
+  Geometry,
+  Route,
+  GeoJSONFeature,
+  GeoJSONFeatureCollection
+} from "../model";
 import * as stringToColor from "string-to-color";
 import * as geoJsonLength from "geojson-length";
 import { Option, fromNullable, none, some } from "fp-ts/lib/Option";
+
+const toGeoJson = require("@mapbox/togeojson");
 
 function getElevationGain(coordinates: Geometry["coordinates"]): number {
   return coordinates
@@ -81,7 +89,64 @@ export const route = Query({
       currentView.routeId.isSome()
     ) {
       const routeId = currentView.routeId.value;
-      return Promise.resolve(fromNullable(routes.find(r => r.id === routeId)));
+
+      if (routeId === "gpx") {
+        const parser = new DOMParser();
+
+        return Promise.resolve(
+          fromNullable((window as any).gpxFile).map(gpx => {
+            const featureCollection: GeoJSONFeatureCollection = toGeoJson.gpx(
+              parser.parseFromString(gpx, "text/xml")
+            );
+
+            const geoJSONFeature: GeoJSONFeature = featureCollection.features
+              .filter(f => f.geometry.type === "LineString")
+              .reduce((acc, feature) => {
+                return {
+                  ...acc,
+
+                  geometry: {
+                    ...acc.geometry,
+                    coordinates: acc.geometry.coordinates.concat(
+                      feature.geometry.coordinates
+                    )
+                  }
+                };
+              });
+
+            const minElevation = geoJSONFeature.geometry.coordinates.reduce(
+              (acc: number, c) => (c[2] && c[2] < acc ? c[2] : acc),
+              Number.MAX_SAFE_INTEGER
+            );
+
+            const maxElevation = geoJSONFeature.geometry.coordinates.reduce(
+              (acc: number, c) => (c[2] && c[2] > acc ? c[2] : acc),
+              Number.MIN_SAFE_INTEGER
+            );
+
+            return {
+              ...geoJSONFeature,
+              properties: {
+                ...geoJSONFeature.properties,
+                color: "#38ffcc",
+                length:
+                  Math.round(geoJsonLength(geoJSONFeature.geometry) / 100) / 10,
+                elevationGain: Math.round(
+                  getElevationGain(geoJSONFeature.geometry.coordinates)
+                ),
+                minElevation,
+                maxElevation,
+                url: "gpx"
+              },
+              id: "gpx"
+            };
+          })
+        );
+      } else {
+        return Promise.resolve(
+          fromNullable(routes.find(r => r.id === routeId))
+        );
+      }
     }
 
     return Promise.resolve(none);
