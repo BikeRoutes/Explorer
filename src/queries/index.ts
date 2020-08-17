@@ -39,13 +39,8 @@ export const routes = Query({
   cacheStrategy: available,
   params: {},
   fetch: (): Promise<Route[]> =>
-    fetch(
-      `${
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:8081/"
-          : "https://or52hotxz1.execute-api.us-east-1.amazonaws.com/dev/"
-      }`
-    )
+    // fetch("http://localhost:8081/")
+    fetch("https://or52hotxz1.execute-api.us-east-1.amazonaws.com/dev/")
       .then(res => res.json() as Promise<{ body: string }>)
       .then((res): GeoJSONFeature[] => JSON.parse(res.body))
       .then(features =>
