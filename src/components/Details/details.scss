@@ -94,6 +94,10 @@
       width: 30%;
       padding-top: 32px;
 
+      > div {
+        width: 100%;
+      }
+
       .carousel {
         img {
           height: 200px;
