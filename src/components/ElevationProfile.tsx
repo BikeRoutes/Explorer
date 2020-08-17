@@ -69,7 +69,7 @@ export default class ElevationProfile extends React.Component<Props> {
               data: elevations.map((el, i) =>
                 i === this.props.activeRoutePointIndex ? el : null
               ),
-              backgroundColor: "blue",
+              backgroundColor: "#5bb3e0",
               datasetKeyProvider: "userLocation"
             }
           ]
