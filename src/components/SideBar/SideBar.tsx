@@ -64,7 +64,7 @@ class SideBar extends React.PureComponent<Props> {
 
               const reader = new FileReader();
               reader.addEventListener("load", event => {
-                (window as any).gpxFile = event.target!.result;
+                localStorage.setItem("gpxFile", event.target!.result as any);
 
                 this.props.doUpdateLocation(
                   viewToLocation({ view: "navigation", routeId: some("gpx") })

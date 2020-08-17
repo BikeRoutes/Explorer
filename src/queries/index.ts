@@ -94,7 +94,7 @@ export const route = Query({
         const parser = new DOMParser();
 
         return Promise.resolve(
-          fromNullable((window as any).gpxFile).map(gpx => {
+          fromNullable(localStorage.getItem("gpxFile")).map(gpx => {
             const featureCollection: GeoJSONFeatureCollection = toGeoJson.gpx(
               parser.parseFromString(gpx, "text/xml")
             );
