@@ -13,6 +13,16 @@
       background: #f2f2f2;
     }
   }
+
+  .elevation-profile-wrapper {
+    position: fixed;
+    bottom: 0;
+    height: 200px;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background: white;
+  }
 }
 
 .is-phone,

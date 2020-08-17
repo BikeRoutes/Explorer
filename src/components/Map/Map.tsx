@@ -139,7 +139,7 @@ class App extends React.PureComponent<Props> {
       })
     );
 
-    map.addControl(new mapboxgl.ScaleControl());
+    this.props.navigating && map.addControl(new mapboxgl.ScaleControl());
   }
 
   getRouteColor(route: Route): string {
@@ -325,14 +325,12 @@ class App extends React.PureComponent<Props> {
     setTimeout(() => this.map.map(map => map.resize()), 30);
   }
 
-  UNSAFE_componentWillMount() {
+  componentWillUnmount() {
+    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
+
     this.positionWatch.map(positionWatch =>
       navigator.geolocation.clearWatch(positionWatch)
     );
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
   }
 
   render() {
