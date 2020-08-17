@@ -10,6 +10,8 @@ import { Option, none, some } from "fp-ts/lib/Option";
 import { Route } from "../../model";
 import mobileDetect from "@buildo/bento/utils/mobileDetect";
 import { identity } from "fp-ts/lib/function";
+import getDrinkingWater, { DrinkingWaterNode } from "./getDrinkingWater";
+import DrinkingWaterMarker from "../DrinkingWaterMarker";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.scss";
@@ -53,6 +55,7 @@ export type Props = {
   onSortRoutes?: () => void;
   startPosition: "userLocation" | "firstRoute";
   navigating: boolean;
+  showDrinkingWater: boolean;
 };
 
 class Map extends React.PureComponent<Props> {
@@ -60,6 +63,24 @@ class Map extends React.PureComponent<Props> {
   popupSelectedRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   positionWatch: Option<number> = none;
+
+  drinkingWaterNodes: {
+    [id: string]: DrinkingWaterNode;
+  } = {};
+
+  drinkingWaterMarkers: mapboxgl.Marker[] = [];
+
+  updateDrinkingWater = throttle(() => {
+    if (this.props.showDrinkingWater) {
+      this.map.map(map => {
+        getDrinkingWater({
+          around: 20000,
+          lat: map.getCenter().lat,
+          lng: map.getCenter().lng
+        }).then(this.addWaterMarkers);
+      });
+    }
+  }, 1000);
 
   initializeMap() {
     (mapboxgl as any).accessToken =
@@ -94,6 +115,8 @@ class Map extends React.PureComponent<Props> {
     if (md.isDesktop) {
       map.on("mousemove", this.onMouseMove);
     }
+
+    map.on("move", this.updateDrinkingWater);
 
     this.props.innerRef && this.props.innerRef(map);
   }
@@ -160,6 +183,27 @@ class Map extends React.PureComponent<Props> {
       });
     });
   }
+
+  addWaterMarkers = (drinkingWaterNodes: DrinkingWaterNode[]) => {
+    this.map.map(map => {
+      drinkingWaterNodes.forEach(drinkingWaterNode => {
+        if (!this.drinkingWaterNodes[drinkingWaterNode.id]) {
+          const element = document.createElement("div");
+          ReactDOM.render(<DrinkingWaterMarker />, element);
+
+          const marker: mapboxgl.Marker = new mapboxgl.Marker({
+            element
+          }).setLngLat([drinkingWaterNode.lon, drinkingWaterNode.lat]);
+
+          marker.addTo(map);
+
+          this.drinkingWaterNodes[drinkingWaterNode.id] = drinkingWaterNode;
+
+          this.drinkingWaterMarkers.push(marker);
+        }
+      });
+    });
+  };
 
   onMouseMove = throttle((e: mapboxgl.MapMouseEvent) => {
     type ClosestRoute = {
@@ -261,7 +305,15 @@ class Map extends React.PureComponent<Props> {
       this.flyToRoute(this.props.selectedRoute.value);
     }
 
-    setTimeout(() => this.map.map(map => map.resize()), 30);
+    if (!this.props.showDrinkingWater) {
+      this.drinkingWaterMarkers.forEach(drinkingWaterMarker => {
+        drinkingWaterMarker.remove();
+      });
+      this.drinkingWaterMarkers = [];
+      this.drinkingWaterNodes = {};
+    }
+
+    requestAnimationFrame(() => this.map.map(map => map.resize()));
   }
 
   render() {

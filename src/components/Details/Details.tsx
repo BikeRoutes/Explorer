@@ -172,6 +172,7 @@ class Details extends React.Component<Props> {
                       selectedRoute={none}
                       altimeter={false}
                       altitudeControl={false}
+                      drinkingWaterControl={false}
                       geoLocateControl
                       noSleep={false}
                       speedometer={false}

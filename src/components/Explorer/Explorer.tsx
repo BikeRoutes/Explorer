@@ -86,6 +86,7 @@ class Explorer extends React.Component<Props, State> {
               noSleep={false}
               altimeter={false}
               altitudeControl={false}
+              drinkingWaterControl={false}
               geoLocateControl
               speedometer={false}
               scale={false}

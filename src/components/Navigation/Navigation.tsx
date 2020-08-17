@@ -45,6 +45,7 @@ class Navigation extends React.Component<Props> {
                 navigatingRoute={route}
                 altimeter={!md.isDesktop}
                 altitudeControl
+                drinkingWaterControl
                 noSleep
                 scale
                 speedometer={!md.isDesktop}

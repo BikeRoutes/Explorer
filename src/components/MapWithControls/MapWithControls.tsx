@@ -13,18 +13,20 @@ import CheapRuler from "cheap-ruler";
 import { identity } from "fp-ts/lib/function";
 
 import "./mapWithControls.scss";
+import DrinkingWaterMarker from "../DrinkingWaterMarker";
 
 /* eslint-disable array-callback-return */
 
 const noSleep = new NoSleep();
 
-type Props = Omit<MapProps, "navigating"> & {
+type Props = Omit<MapProps, "navigating" | "showDrinkingWater"> & {
   noSleep: boolean;
   geoLocateControl: boolean;
   altimeter: boolean;
   speedometer: boolean;
   navigatingRoute: Option<Route>;
   altitudeControl: boolean;
+  drinkingWaterControl: boolean;
   scale: boolean;
 };
 
@@ -32,6 +34,7 @@ type State = {
   position: Option<Position>;
   deviceBearing: Option<number>;
   showElevationProfile: boolean;
+  showDrinkingWater: boolean;
   geoLocationState:
     | "Off"
     | "North"
@@ -60,6 +63,7 @@ class MapWithControls extends React.Component<Props, State> {
     position: none,
     deviceBearing: none,
     showElevationProfile: false,
+    showDrinkingWater: false,
     geoLocationState:
       this.props.startPosition === "userLocation" ? "NorthTracking" : "Off"
   };
@@ -529,6 +533,26 @@ class MapWithControls extends React.Component<Props, State> {
               </svg>
             </View>
           )}
+
+          {this.props.drinkingWaterControl && (
+            <View
+              className="toggle-drinking-water control-button"
+              onClick={() => {
+                this.setState({
+                  showDrinkingWater: !this.state.showDrinkingWater
+                });
+              }}
+              hAlignContent="center"
+              vAlignContent="center"
+              style={{
+                background: this.state.showDrinkingWater ? "#f8f8f8" : undefined
+              }}
+            >
+              <DrinkingWaterMarker
+                color={this.state.showDrinkingWater ? "#5bb3e0" : "#393939"}
+              />
+            </View>
+          )}
         </View>
 
         {this.props.geoLocateControl && (
@@ -649,6 +673,7 @@ class MapWithControls extends React.Component<Props, State> {
             onRouteHover={this.props.onRouteHover}
             onRouteSelect={this.props.onRouteSelect}
             onSortRoutes={this.props.onSortRoutes}
+            showDrinkingWater={this.state.showDrinkingWater}
           />
         </View>
       </View>
