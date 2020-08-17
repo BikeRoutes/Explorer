@@ -132,6 +132,8 @@ class App extends React.PureComponent<Props> {
         showCompass: !md.isDesktop
       })
     );
+
+    map.addControl(new mapboxgl.ScaleControl());
   }
 
   getRouteColor(route: Route): string {

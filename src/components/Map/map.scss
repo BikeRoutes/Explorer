@@ -7,6 +7,13 @@
     position: static;
   }
 
+  .mapboxgl-ctrl-scale {
+    position: fixed;
+    right: 10px;
+    bottom: 20px;
+    font-size: 12px;
+  }
+
   &.isNavigating {
     position: fixed;
     top: 0;
@@ -37,6 +44,13 @@
       .mapboxgl-ctrl-top-right {
         top: 80px;
       }
+    }
+
+    .mapboxgl-ctrl-scale {
+      position: fixed;
+      right: 15px;
+      bottom: 35px;
+      font-size: 12px;
     }
   }
 }
