@@ -283,27 +283,9 @@ class App extends React.PureComponent<Props> {
     }
   }
 
-  onFullscreenChange = () => {
-    if (document.fullscreenElement) {
-      this.map.map(map => map.scrollZoom.enable());
-      this.centerUserLocation();
-    } else {
-      this.map.map(map => map.scrollZoom.disable());
-    }
-  };
-
   componentDidMount() {
     this.initializeMap();
     this.props.innerRef(this.map);
-
-    document.addEventListener("fullscreenchange", this.onFullscreenChange);
-
-    this.positionWatch = some(
-      navigator.geolocation.watchPosition(position => {
-        localStorage.setItem("start_lat", String(position.coords.latitude));
-        localStorage.setItem("start_lng", String(position.coords.longitude));
-      })
-    );
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -324,14 +306,6 @@ class App extends React.PureComponent<Props> {
     }
 
     setTimeout(() => this.map.map(map => map.resize()), 30);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
-
-    this.positionWatch.map(positionWatch =>
-      navigator.geolocation.clearWatch(positionWatch)
-    );
   }
 
   render() {
