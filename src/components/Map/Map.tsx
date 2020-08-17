@@ -146,7 +146,8 @@ class App extends React.PureComponent<Props> {
     return (this.props.selectedRoute.isSome() &&
       route === this.props.selectedRoute.value) ||
       (this.props.hoveredRoute.isSome() &&
-        route === this.props.hoveredRoute.value)
+        route === this.props.hoveredRoute.value) ||
+      this.props.navigating
       ? "#387ddf"
       : route.properties.color;
   }

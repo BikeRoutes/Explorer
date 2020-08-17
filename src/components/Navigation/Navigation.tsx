@@ -172,7 +172,6 @@ class Navigation extends React.Component<Props, State> {
                   routes={[route.value]}
                   startPosition="firstRoute"
                   navigating
-                  hoveredRoute={route} // fixed blue color that is easily visible
                   innerRef={map => {
                     if (this.map.isNone()) {
                       this.map = map;
@@ -180,6 +179,7 @@ class Navigation extends React.Component<Props, State> {
                     }
                   }}
                   // fake props
+                  hoveredRoute={none}
                   selectedRoute={none}
                   onRouteHover={() => {}}
                   onRouteSelect={() => {}}
