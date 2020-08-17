@@ -301,10 +301,6 @@ class App extends React.PureComponent<Props> {
       this.flyToRoute(this.props.selectedRoute.value);
     }
 
-    if (this.props.navigating) {
-      this.centerUserLocation();
-    }
-
     setTimeout(() => this.map.map(map => map.resize()), 30);
   }
 
