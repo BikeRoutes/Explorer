@@ -3,7 +3,7 @@ import { Line, defaults } from "react-chartjs-2";
 import { Route } from "../model";
 import uniq from "lodash/uniq";
 import * as geoJsonLength from "geojson-length";
-import { Option, none, some } from "fp-ts/lib/Option";
+import { Option, none } from "fp-ts/lib/Option";
 
 defaults.global.animation = 0;
 
@@ -16,8 +16,6 @@ export default class ElevationProfile extends React.Component<Props> {
   interval: Option<NodeJS.Timeout> = none;
 
   render() {
-    console.log(this.props.activeRoutePointIndex);
-
     const scale = Math.round(this.props.route.properties.length / 10) || 1;
 
     const round = (number: number, roundedInteger: number): number => {
@@ -49,6 +47,7 @@ export default class ElevationProfile extends React.Component<Props> {
 
     return (
       <Line
+        datasetKeyProvider={dataset => dataset.datasetKeyProvider}
         data={{
           datasets: [
             {
@@ -57,16 +56,21 @@ export default class ElevationProfile extends React.Component<Props> {
               borderWidth: 0,
               yAxisID: "y-axis",
               xAxisID: "x-axis-hidden",
-              data: elevations
+              data: elevations,
+              datasetKeyProvider: "elevation"
             },
             {
               xAxisID: "x-axis",
-              data: []
+              data: [],
+              datasetKeyProvider: "ticks"
             },
             {
               yAxisID: "y-axis",
-              data: [{ x: 2000, y: 200 }],
-              backgroundColor: "blue"
+              data: elevations.map((el, i) =>
+                i === this.props.activeRoutePointIndex ? el : null
+              ),
+              backgroundColor: "blue",
+              datasetKeyProvider: "userLocation"
             }
           ]
         }}

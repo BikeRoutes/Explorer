@@ -22,7 +22,7 @@ const commands = declareCommands({ doUpdateLocation });
 type Props = typeof queries.Props & typeof commands.Props;
 
 type State = {
-  activeRoutePointIndex: Option<number>;
+  position: Option<Position>;
 };
 
 class Navigation extends React.Component<Props, State> {
@@ -30,7 +30,7 @@ class Navigation extends React.Component<Props, State> {
   positionWatch: Option<number> = none;
 
   state: State = {
-    activeRoutePointIndex: none
+    position: none
   };
 
   componentDidMount() {
@@ -41,10 +41,8 @@ class Navigation extends React.Component<Props, State> {
         localStorage.setItem("start_lat", String(position.coords.latitude));
         localStorage.setItem("start_lng", String(position.coords.longitude));
 
-        this.getClosestRoutePoint(position).map(activeRoutePointIndex => {
-          this.setState({
-            activeRoutePointIndex: some(activeRoutePointIndex.index)
-          });
+        this.setState({
+          position: some(position)
         });
       })
     );
@@ -80,7 +78,9 @@ class Navigation extends React.Component<Props, State> {
                   Math.pow(Math.abs(point.x - routePoint.x), 2) +
                     Math.pow(Math.abs(point.y - routePoint.y), 2)
                 );
-                return distance < acc.distance ? { distance, index } : acc;
+                return distance < 200 && distance < acc.distance
+                  ? { distance, index }
+                  : acc;
               },
               {
                 distance: Infinity,
@@ -126,7 +126,13 @@ class Navigation extends React.Component<Props, State> {
               <View className="elevation-profile-wrapper">
                 <ElevationProfile
                   route={route.value}
-                  activeRoutePointIndex={this.state.activeRoutePointIndex.toUndefined()}
+                  activeRoutePointIndex={this.state.position
+                    .chain(position =>
+                      this.getClosestRoutePoint(position).map(
+                        activeRoutePointIndex => activeRoutePointIndex.index
+                      )
+                    )
+                    .toUndefined()}
                 />
               </View>
 
@@ -136,13 +142,16 @@ class Navigation extends React.Component<Props, State> {
                   startPosition="firstRoute"
                   navigating
                   hoveredRoute={route} // fixed blue color that is easily visible
+                  innerRef={map => {
+                    if (this.map.isNone()) {
+                      this.map = map;
+                      this.forceUpdate();
+                    }
+                  }}
                   // fake props
                   selectedRoute={none}
                   onRouteHover={() => {}}
                   onRouteSelect={() => {}}
-                  innerRef={map => {
-                    this.map = map;
-                  }}
                 />
               </View>
             </View>
