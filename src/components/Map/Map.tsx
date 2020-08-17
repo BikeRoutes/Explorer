@@ -61,6 +61,19 @@ class App extends React.PureComponent<Props> {
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   positionWatch: Option<number> = none;
 
+  geoLocateControl: mapboxgl.GeolocateControl = new mapboxgl.GeolocateControl({
+    positionOptions: {
+      enableHighAccuracy: true
+    },
+    trackUserLocation: true,
+    showUserLocation: true,
+    showAccuracyCircle: true,
+
+    fitBoundsOptions: {
+      maxZoom: this.props.navigating ? 15 : 11
+    }
+  });
+
   centerUserLocation = () => {
     fromNullable(
       document.querySelector<HTMLButtonElement>(
@@ -109,22 +122,15 @@ class App extends React.PureComponent<Props> {
 
     map.on("moveend", () => this.props.innerRef(this.map));
 
-    // map.addControl(new mapboxgl.FullscreenControl());
+    map.on("zoom", () => {
+      if (document.querySelector(".mapboxgl-ctrl-geolocate-background")) {
+        (this.geoLocateControl as any).options.fitBoundsOptions = {
+          zoom: map.getZoom()
+        };
+      }
+    });
 
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true
-        },
-        trackUserLocation: true,
-        showUserLocation: true,
-        showAccuracyCircle: true,
-
-        fitBoundsOptions: {
-          maxZoom: this.props.startPosition === "firstRoute" ? 15 : 11
-        }
-      })
-    );
+    map.addControl(this.geoLocateControl);
 
     map.addControl(
       new mapboxgl.NavigationControl({
