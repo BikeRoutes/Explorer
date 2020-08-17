@@ -14,6 +14,7 @@ import cx from "classnames";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.scss";
+import getDrinkingWater from "./getDrinkingWater";
 
 /* eslint-disable array-callback-return */
 
@@ -73,6 +74,18 @@ class App extends React.PureComponent<Props> {
       maxZoom: this.props.navigating ? 15 : 11
     }
   });
+
+  updateDrinkingWater = throttle(() => {
+    this.map.map(map => {
+      getDrinkingWater({
+        around: 20000,
+        lat: map.getCenter().lat,
+        lng: map.getCenter().lng
+      })
+        .then(res => {})
+        .catch(() => {});
+    });
+  }, 1000);
 
   centerUserLocation = () => {
     fromNullable(
@@ -140,6 +153,8 @@ class App extends React.PureComponent<Props> {
     );
 
     map.addControl(new mapboxgl.ScaleControl());
+
+    map.on("move", this.updateDrinkingWater);
   }
 
   getRouteColor(route: Route): string {
