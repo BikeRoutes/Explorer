@@ -34,6 +34,7 @@
     "mapbox-gl": "^1.9.1",
     "nosleep.js": "^0.9.0",
     "react": "^16.13.1",
+    "react-app-rewired": "^2.1.6",
     "react-chartjs-2": "^2.9.0",
     "react-dom": "^16.13.1",
     "react-responsive-carousel": "^3.1.51",
@@ -45,8 +46,8 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "web-start": "react-scripts start",
-    "web-build": "react-scripts build",
+    "web-start": "react-app-rewired start",
+    "web-build": "react-app-rewired build",
     "web-deploy": "yarn web-build && gh-pages -d build",
     "server-start": "yarn ts-node --files --project ./serverTsConfig.json server/server.ts",
     "server-build": "yarn tsc --project ./serverTsConfig.json ",
