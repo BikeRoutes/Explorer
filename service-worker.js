@@ -42,11 +42,8 @@ this.addEventListener("fetch", function(event) {
     url.startsWith("https://") &&
     (url.includes("tiles.mapbox.com") || url.includes("api.mapbox.com"))
   ) {
-    caches.open("mapbox").then(cache => console.log(cache));
-
     event.respondWith(
       caches.match(event.request).then(function(resp) {
-        console.log(resp ? "FROM CACHE: " : "FETCHING: ", url);
         return (
           resp ||
           fetch(event.request).then(function(response) {
