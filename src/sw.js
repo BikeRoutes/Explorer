@@ -24,35 +24,32 @@ workbox.routing.registerNavigationRoute(
 
 /**  CUSTOM CODE **/
 
-this.addEventListener("install", function(event) {
+this.addEventListener("install", event => {
   console.log("Installing Service Worker");
   event.waitUntil(this.skipWaiting());
 });
 
-this.addEventListener("activate", function(event) {
+this.addEventListener("activate", event => {
   event.waitUntil(this.clients.claim());
 });
 
-this.addEventListener("fetch", function(event) {
-  var url = event.request.url;
+this.addEventListener("fetch", event => {
+  // return any GET request "cache-first"
+  event.respondWith(
+    caches.match(event.request).then(resp => {
+      const newRequest = fetch(event.request).then(response => {
+        if (event.request.method === "GET") {
+          const cacheResponse = response.clone();
 
-  if (
-    url.startsWith("https://") &&
-    (url.includes("tiles.mapbox.com") || url.includes("api.mapbox.com"))
-  ) {
-    event.respondWith(
-      caches.match(event.request).then(function(resp) {
-        return (
-          resp ||
-          fetch(event.request).then(function(response) {
-            var cacheResponse = response.clone();
-            caches.open("mapbox").then(function(cache) {
-              cache.put(event.request, cacheResponse);
-            });
-            return response;
-          })
-        );
-      })
-    );
-  }
+          caches.open("requests").then(cache => {
+            cache.put(event.request, cacheResponse);
+          });
+        }
+
+        return response;
+      });
+
+      return resp || newRequest;
+    })
+  );
 });
