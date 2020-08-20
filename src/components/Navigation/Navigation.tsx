@@ -183,6 +183,7 @@ class Navigation extends React.Component<Props, State> {
                   selectedRoute={none}
                   onRouteHover={() => {}}
                   onRouteSelect={() => {}}
+                  onSortRoutes={() => {}}
                 />
               </View>
             </View>

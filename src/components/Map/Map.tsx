@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import * as ReactDOM from "react-dom";
 import throttle from "lodash/throttle";
-import * as mapboxgl from "mapbox-gl";
+import mapboxgl from "mapbox-gl";
 import Popup from "../Popup/Popup";
 import Marker from "../Marker/Marker";
 import View from "../View";
@@ -51,6 +51,7 @@ type Props = {
   onRouteHover: (route: Option<Route>) => void;
   onRouteSelect: (route: Route) => void;
   innerRef: (map: Option<mapboxgl.Map>) => void;
+  onSortRoutes: () => void;
   startPosition: "userLocation" | "firstRoute";
   navigating: boolean;
 };
@@ -114,13 +115,17 @@ class App extends React.PureComponent<Props> {
       ) {
         this.flyToRoute(this.props.routes[0], { animate: false, padding: 80 });
       }
+
+      this.props.innerRef(this.map);
     });
 
     if (md.isDesktop) {
       map.on("mousemove", this.onMouseMove);
     }
 
-    map.on("moveend", () => this.props.innerRef(this.map));
+    map.on("moveend", () => {
+      this.props.onSortRoutes();
+    });
 
     map.on("zoom", () => {
       if (document.querySelector(".mapboxgl-ctrl-geolocate-background")) {
@@ -285,7 +290,6 @@ class App extends React.PureComponent<Props> {
 
   componentDidMount() {
     this.initializeMap();
-    this.props.innerRef(this.map);
   }
 
   componentDidUpdate(prevProps: Props) {

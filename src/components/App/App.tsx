@@ -5,6 +5,9 @@ import View from "../View";
 import Explorer from "../Explorer/Explorer";
 import Details from "../Details/Details";
 import Navigation from "../Navigation/Navigation";
+import mapboxgl from "mapbox-gl";
+
+mapboxgl.prewarm();
 
 const queries = declareQueries({ currentView });
 

@@ -165,6 +165,7 @@ class Details extends React.Component<Props> {
                       onRouteHover={() => {}}
                       onRouteSelect={() => {}}
                       innerRef={() => {}}
+                      onSortRoutes={() => {}}
                     />
                   </View>
                   <View className="elevation-profile-wrapper" shrink={false}>

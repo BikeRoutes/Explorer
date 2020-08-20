@@ -43,6 +43,17 @@ class Explorer extends React.Component<Props, State> {
     });
   };
 
+  onSortRoutes = () => {
+    this.forceUpdate();
+  };
+
+  updateInnerRef = (map: Option<mapboxgl.Map>) => {
+    if (this.map.isNone()) {
+      this.map = map;
+      this.forceUpdate();
+    }
+  };
+
   render() {
     return this.props.routes.fold(
       null,
@@ -67,10 +78,8 @@ class Explorer extends React.Component<Props, State> {
               hoveredRoute={this.state.hoveredRoute}
               onRouteHover={this.onRouteHover}
               onRouteSelect={this.onRouteSelect}
-              innerRef={map => {
-                this.map = map;
-                this.forceUpdate();
-              }}
+              onSortRoutes={this.onSortRoutes}
+              innerRef={this.updateInnerRef}
               startPosition="userLocation"
               navigating={false}
             />
