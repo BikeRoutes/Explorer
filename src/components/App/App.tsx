@@ -6,6 +6,7 @@ import Explorer from "../Explorer/Explorer";
 import Details from "../Details/Details";
 import Navigation from "../Navigation/Navigation";
 import mapboxgl from "mapbox-gl";
+import ServiceWorkerWrapper from "../ServiceWorkerWrapper";
 
 mapboxgl.prewarm();
 
@@ -19,7 +20,8 @@ class App extends React.Component<Props> {
       null,
       () => null,
       currentView => (
-        <View className="app" height="100%">
+        <View className="app" height="100%" column>
+          <ServiceWorkerWrapper />
           {currentView.view === "explorer" && <Explorer />}
           {currentView.view === "details" && <Details />}
           {currentView.view === "navigation" && <Navigation />}
