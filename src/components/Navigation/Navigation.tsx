@@ -103,6 +103,16 @@ class Navigation extends React.Component<Props, State> {
         if (route.isNone()) {
           return null;
         } else {
+          const speed = Math.round(
+            this.state.position.fold(0, pos =>
+              pos.coords.speed ? pos.coords.speed / 1000 : 0
+            )
+          );
+
+          const altitude = Math.round(
+            this.state.position.fold(0, pos => pos.coords.altitude || 0)
+          );
+
           return (
             <View
               className={cx("navigation", { gpx: route.value.id === "gpx" })}
@@ -166,6 +176,16 @@ class Navigation extends React.Component<Props, State> {
                   />
                 </View>
               )}
+
+              <View className="speed-wrapper" column hAlignContent="center">
+                {speed}
+                <span className="unit">km/s</span>
+              </View>
+
+              <View className="altitude-wrapper" column hAlignContent="center">
+                {altitude}
+                <span className="unit">msl</span>
+              </View>
 
               <View shrink={false} className="map-wrapper">
                 <Map
