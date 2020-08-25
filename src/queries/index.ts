@@ -6,9 +6,9 @@ import {
   GeoJSONFeature,
   GeoJSONFeatureCollection
 } from "../model";
-import * as stringToColor from "string-to-color";
 import * as geoJsonLength from "geojson-length";
 import { Option, fromNullable, none, some } from "fp-ts/lib/Option";
+import stringToColor from "../stringToColor";
 
 const toGeoJson = require("@mapbox/togeojson");
 
