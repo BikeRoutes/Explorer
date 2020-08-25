@@ -119,9 +119,10 @@ class Navigation extends React.Component<Props, State> {
           return null;
         } else {
           const speed = Math.round(
-            this.state.position.fold(0, pos =>
-              pos.coords.speed ? pos.coords.speed / 1000 : 0
-            )
+            this.state.position.fold(0, pos => {
+              // speed is in m/s
+              return pos.coords.speed ? (pos.coords.speed / 1000) * 3600 : 0;
+            })
           );
 
           const altitude = Math.round(
@@ -168,7 +169,7 @@ class Navigation extends React.Component<Props, State> {
 
               <View className="speed-wrapper" column hAlignContent="center">
                 {speed}
-                <span className="unit">km/s</span>
+                <span className="unit">km/h</span>
               </View>
 
               <View className="altitude-wrapper" column hAlignContent="center">
