@@ -167,12 +167,22 @@ class Navigation extends React.Component<Props, State> {
                 </View>
               )}
 
-              <View className="speed-wrapper" column hAlignContent="center">
+              <View
+                className="speed-wrapper control-button"
+                column
+                vAlignContent="center"
+                hAlignContent="center"
+              >
                 {speed}
                 <span className="unit">km/h</span>
               </View>
 
-              <View className="altitude-wrapper" column hAlignContent="center">
+              <View
+                className="altitude-wrapper control-button"
+                column
+                vAlignContent="center"
+                hAlignContent="center"
+              >
                 {altitude}
                 <span className="unit">msl</span>
               </View>

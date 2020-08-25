@@ -43,6 +43,7 @@
     .control-button {
       width: 60px;
       height: 60px;
+      border-radius: 100%;
     }
 
     .toggle-elevation {
@@ -58,24 +59,21 @@
       z-index: 99;
       width: 60px;
 
-      font-weight: 900;
+      font-weight: 500;
       font-size: 20px;
-      text-shadow: 0px 0px 2px white;
-      -webkit-text-stroke-width: 0.7px;
-      -webkit-text-stroke-color: white;
 
       .unit {
         font-size: 10px;
-        -webkit-text-stroke-width: 0.1px;
+        font-weight: 400;
       }
     }
 
     .speed-wrapper {
-      top: 250px;
+      top: 260px;
     }
 
     .altitude-wrapper {
-      top: 300px;
+      top: 340px;
     }
   }
 }
