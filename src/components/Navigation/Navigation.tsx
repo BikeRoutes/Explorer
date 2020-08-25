@@ -9,6 +9,8 @@ import { declareCommands } from "react-avenger";
 import { doUpdateLocation } from "../../commands";
 import ElevationProfile from "../ElevationProfile";
 import mapboxgl from "mapbox-gl";
+import memoize from "memoize-one";
+import { Route } from "../../model";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./navigation.scss";
@@ -93,6 +95,21 @@ class Navigation extends React.Component<Props, State> {
     });
   };
 
+  updateInnerRef = (map: Option<mapboxgl.Map>) => {
+    if (this.map.isNone()) {
+      this.map = map;
+      this.forceUpdate();
+    }
+  };
+
+  getRoutes = memoize(
+    (route: Route) => {
+      return [route];
+    },
+    (newArgs: Route[], prevArgs: Route[]): boolean =>
+      newArgs[0].id === prevArgs[0].id
+  );
+
   render() {
     return this.props.route.fold(
       null,
@@ -161,21 +178,12 @@ class Navigation extends React.Component<Props, State> {
 
               <View shrink={false} className="map-wrapper">
                 <Map
-                  routes={[route.value]}
+                  routes={this.getRoutes(route.value)}
                   startPosition="firstRoute"
                   navigating
-                  innerRef={map => {
-                    if (this.map.isNone()) {
-                      this.map = map;
-                      this.forceUpdate();
-                    }
-                  }}
-                  // fake props
+                  innerRef={this.updateInnerRef}
                   hoveredRoute={none}
                   selectedRoute={none}
-                  onRouteHover={() => {}}
-                  onRouteSelect={() => {}}
-                  onSortRoutes={() => {}}
                 />
               </View>
             </View>

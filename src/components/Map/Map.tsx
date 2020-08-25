@@ -48,10 +48,10 @@ type Props = {
   routes: Route[];
   selectedRoute: Option<Route>;
   hoveredRoute: Option<Route>;
-  onRouteHover: (route: Option<Route>) => void;
-  onRouteSelect: (route: Route) => void;
-  innerRef: (map: Option<mapboxgl.Map>) => void;
-  onSortRoutes: () => void;
+  onRouteHover?: (route: Option<Route>) => void;
+  onRouteSelect?: (route: Route) => void;
+  innerRef?: (map: Option<mapboxgl.Map>) => void;
+  onSortRoutes?: () => void;
   startPosition: "userLocation" | "firstRoute";
   navigating: boolean;
 };
@@ -116,7 +116,7 @@ class App extends React.PureComponent<Props> {
         this.flyToRoute(this.props.routes[0], { animate: false, padding: 80 });
       }
 
-      this.props.innerRef(this.map);
+      this.props.innerRef && this.props.innerRef(this.map);
     });
 
     if (md.isDesktop) {
@@ -124,7 +124,7 @@ class App extends React.PureComponent<Props> {
     }
 
     map.on("moveend", () => {
-      this.props.onSortRoutes();
+      this.props.onSortRoutes && this.props.onSortRoutes();
     });
 
     map.on("zoom", () => {
@@ -178,7 +178,7 @@ class App extends React.PureComponent<Props> {
         };
 
         map.on("click", layer.id, () => {
-          this.props.onRouteSelect(route);
+          this.props.onRouteSelect && this.props.onRouteSelect(route);
         });
 
         map.addLayer(layer);
@@ -193,7 +193,11 @@ class App extends React.PureComponent<Props> {
 
         const element = document.createElement("div");
         ReactDOM.render(
-          <Marker onClick={() => this.props.onRouteSelect(route)} />,
+          <Marker
+            onClick={() =>
+              this.props.onRouteSelect && this.props.onRouteSelect(route)
+            }
+          />,
           element
         );
 
@@ -223,10 +227,11 @@ class App extends React.PureComponent<Props> {
       );
 
       if (closestRoute.distance < 25) {
-        this.props.onRouteHover(some(closestRoute.route));
+        this.props.onRouteHover &&
+          this.props.onRouteHover(some(closestRoute.route));
       } else {
         this.props.hoveredRoute.map(() => {
-          this.props.onRouteHover(none);
+          this.props.onRouteHover && this.props.onRouteHover(none);
         });
       }
     });

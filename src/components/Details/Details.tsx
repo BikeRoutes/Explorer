@@ -12,6 +12,7 @@ import { Carousel } from "react-responsive-carousel";
 import { declareCommands } from "react-avenger";
 import { doUpdateLocation } from "../../commands";
 import ElevationProfile from "../ElevationProfile";
+import memoize from "memoize-one";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "./details.scss";
@@ -127,6 +128,14 @@ const commands = declareCommands({ doUpdateLocation });
 type Props = typeof queries.Props & typeof commands.Props;
 
 class Details extends React.Component<Props> {
+  getRoutes = memoize(
+    (route: Route) => {
+      return [route];
+    },
+    (newArgs: Route[], prevArgs: Route[]): boolean =>
+      newArgs[0].id === prevArgs[0].id
+  );
+
   render() {
     return this.props.route.fold(
       null,
@@ -156,16 +165,11 @@ class Details extends React.Component<Props> {
 
                   <View shrink={false} className="map-wrapper">
                     <Map
-                      routes={[route.value]}
+                      routes={this.getRoutes(route.value)}
                       startPosition="firstRoute"
                       navigating={false}
                       hoveredRoute={route} // fixed blue color that is easily visible
-                      // fake props
                       selectedRoute={none}
-                      onRouteHover={() => {}}
-                      onRouteSelect={() => {}}
-                      innerRef={() => {}}
-                      onSortRoutes={() => {}}
                     />
                   </View>
                   <View className="elevation-profile-wrapper" shrink={false}>
