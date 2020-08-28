@@ -1,0 +1,176 @@
+.mapWithControls {
+  position: relative;
+
+  .control-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      cursor: pointer;
+      background: #f2f2f2;
+    }
+  }
+
+  .info-wrapper {
+    position: absolute;
+    z-index: 99;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+
+    .speed-wrapper,
+    .altitude-wrapper {
+      font-weight: 500;
+      font-size: 20px;
+      border-radius: 30px;
+      pointer-events: none;
+
+      .unit {
+        font-size: 10px;
+        font-weight: 400;
+      }
+    }
+
+    :first-child:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      padding-left: 8px;
+      width: 70px;
+    }
+
+    :last-child:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      padding-right: 8px;
+      width: 70px;
+    }
+  }
+
+  .tracking-controls {
+    position: absolute;
+    z-index: 99;
+    bottom: 35px;
+    right: 10px;
+    border-radius: 25px;
+
+    :first-child:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      padding-left: 5px;
+      width: 50px;
+      height: 50px;
+    }
+
+    :last-child:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      padding-right: 5px;
+      width: 50px;
+      height: 50px;
+    }
+  }
+
+  &.showScale {
+    .tracking-controls {
+      margin-bottom: 50px;
+    }
+  }
+
+  .mapboxgl-ctrl-scale {
+    position: fixed;
+    right: 15px;
+    bottom: 35px;
+    font-size: 12px;
+  }
+
+  &.showElevationProfile {
+    .tracking-controls,
+    .mapboxgl-ctrl-scale {
+      bottom: 200px;
+    }
+  }
+
+  .controls-wrapper {
+    position: absolute;
+    z-index: 99;
+    right: 10px;
+
+    .control-button {
+      margin-top: 20px;
+    }
+  }
+
+  .elevation-profile-wrapper {
+    position: absolute;
+    bottom: 0;
+    height: 200px;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+  }
+
+  .userLocationDotMarker {
+    z-index: 99;
+
+    $size: 6px;
+
+    .triangle {
+      position: relative;
+      opacity: 0.9;
+      background-color: #1da1f2;
+      text-align: left;
+      width: $size;
+      height: $size;
+      border-top-right-radius: 30%;
+      transform: translate(6.5px, -4px) rotate(-60deg) skewX(-30deg)
+        scale(1, 0.866);
+
+      &:before {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+        transform: rotate(-135deg) skewX(-45deg) scale(1.414, 0.707)
+          translate(0, -50%);
+        width: $size;
+        height: $size;
+        border-top-right-radius: 30%;
+      }
+
+      &:after {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+        transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414)
+          translate(50%);
+        width: $size;
+        height: $size;
+        border-top-right-radius: 30%;
+      }
+    }
+
+    .userLocationDot {
+      background-color: #1da1f2;
+      width: 19px;
+      height: 19px;
+      border-radius: 30px;
+      border: 2px solid #fff;
+      // transform: translate(50%, 50%);
+
+      &:before {
+        content: "";
+        position: absolute;
+        -webkit-animation: mapboxgl-user-location-dot-pulse 2s infinite;
+        animation: mapboxgl-user-location-dot-pulse 2s infinite;
+
+        background-color: #1da1f2;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+      }
+    }
+  }
+}

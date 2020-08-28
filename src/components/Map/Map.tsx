@@ -44,19 +44,19 @@ export const getRouteDistanceInPixels = (
   }, Infinity);
 };
 
-type Props = {
+export type Props = {
   routes: Route[];
   selectedRoute: Option<Route>;
   hoveredRoute: Option<Route>;
   onRouteHover?: (route: Option<Route>) => void;
   onRouteSelect?: (route: Route) => void;
-  innerRef?: (map: Option<mapboxgl.Map>) => void;
+  innerRef?: (map: mapboxgl.Map) => void;
   onSortRoutes?: () => void;
   startPosition: "userLocation" | "firstRoute";
   navigating: boolean;
 };
 
-class App extends React.PureComponent<Props> {
+class Map extends React.PureComponent<Props> {
   map: Option<mapboxgl.Map> = none;
   popupSelectedRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
@@ -92,8 +92,8 @@ class App extends React.PureComponent<Props> {
       style:
         "mapbox://styles/francescocioria/cjqi3u6lmame92rmw6aw3uyhm?optimize=true",
       center: {
-        lat: parseFloat(localStorage.getItem("start_lat") || "0"),
-        lng: parseFloat(localStorage.getItem("start_lng") || "0")
+        lat: parseFloat(localStorage.getItem("start_lat") || "45.46"),
+        lng: parseFloat(localStorage.getItem("start_lng") || "9.19")
       },
       zoom: 11.0,
       scrollZoom: false
@@ -115,36 +115,13 @@ class App extends React.PureComponent<Props> {
       ) {
         this.flyToRoute(this.props.routes[0], { animate: false, padding: 80 });
       }
-
-      this.props.innerRef && this.props.innerRef(this.map);
     });
 
     if (md.isDesktop) {
       map.on("mousemove", this.onMouseMove);
     }
 
-    map.on("moveend", () => {
-      this.props.onSortRoutes && this.props.onSortRoutes();
-    });
-
-    map.on("zoom", () => {
-      if (document.querySelector(".mapboxgl-ctrl-geolocate-background")) {
-        (this.geoLocateControl as any).options.fitBoundsOptions = {
-          zoom: map.getZoom()
-        };
-      }
-    });
-
-    map.addControl(this.geoLocateControl);
-
-    map.addControl(
-      new mapboxgl.NavigationControl({
-        showZoom: md.isDesktop,
-        showCompass: !md.isDesktop
-      })
-    );
-
-    this.props.navigating && map.addControl(new mapboxgl.ScaleControl());
+    this.props.innerRef && this.props.innerRef(map);
   }
 
   getRouteColor(route: Route): string {
@@ -324,4 +301,4 @@ class App extends React.PureComponent<Props> {
   }
 }
 
-export default App;
+export default Map;

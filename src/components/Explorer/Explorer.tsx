@@ -2,7 +2,8 @@ import * as React from "react";
 import { declareQueries } from "@buildo/bento/data";
 import { routes } from "../../queries";
 import View from "../View";
-import Map, { getRouteDistanceInPixels } from "../Map/Map";
+import { getRouteDistanceInPixels } from "../Map/Map";
+import MapWithControls from "../MapWithControls/MapWithControls";
 import SideBar from "../SideBar/SideBar";
 import { Route } from "../../model";
 import { Option, none, some } from "fp-ts/lib/Option";
@@ -47,9 +48,9 @@ class Explorer extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
-  updateInnerRef = (map: Option<mapboxgl.Map>) => {
+  updateInnerRef = (map: mapboxgl.Map) => {
     if (this.map.isNone()) {
-      this.map = map;
+      this.map = some(map);
       this.forceUpdate();
     }
   };
@@ -72,7 +73,7 @@ class Explorer extends React.Component<Props, State> {
               onRouteClick={this.onRouteSelect}
               selectedRoute={this.state.selectedRoute}
             />
-            <Map
+            <MapWithControls
               routes={routes}
               selectedRoute={this.state.selectedRoute}
               hoveredRoute={this.state.hoveredRoute}
@@ -81,7 +82,13 @@ class Explorer extends React.Component<Props, State> {
               onSortRoutes={this.onSortRoutes}
               innerRef={this.updateInnerRef}
               startPosition="userLocation"
-              navigating={false}
+              navigatingRoute={none}
+              noSleep={false}
+              altimeter={false}
+              altitudeControl={false}
+              geoLocateControl
+              speedometer={false}
+              scale={false}
             />
           </View>
         );

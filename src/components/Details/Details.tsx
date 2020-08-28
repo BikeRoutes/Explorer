@@ -2,7 +2,7 @@ import * as React from "react";
 import { declareQueries } from "@buildo/bento/data";
 import { route, routeReadme } from "../../queries";
 import View from "../View";
-import Map from "../Map/Map";
+import MapWithControls from "../MapWithControls/MapWithControls";
 import * as RemarkableModule from "remarkable";
 import { none, some } from "fp-ts/lib/Option";
 import { Route, viewToLocation } from "../../model";
@@ -164,12 +164,18 @@ class Details extends React.Component<Props> {
                   />
 
                   <View shrink={false} className="map-wrapper">
-                    <Map
+                    <MapWithControls
                       routes={this.getRoutes(route.value)}
                       startPosition="firstRoute"
-                      navigating={false}
+                      navigatingRoute={none}
                       hoveredRoute={route} // fixed blue color that is easily visible
                       selectedRoute={none}
+                      altimeter={false}
+                      altitudeControl={false}
+                      geoLocateControl
+                      noSleep={false}
+                      speedometer={false}
+                      scale={false}
                     />
                   </View>
                   <View className="elevation-profile-wrapper" shrink={false}>
