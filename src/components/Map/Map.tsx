@@ -62,27 +62,6 @@ class Map extends React.PureComponent<Props> {
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   positionWatch: Option<number> = none;
 
-  geoLocateControl: mapboxgl.GeolocateControl = new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true
-    },
-    trackUserLocation: true,
-    showUserLocation: true,
-    showAccuracyCircle: true,
-
-    fitBoundsOptions: {
-      maxZoom: this.props.navigating ? 15 : 11
-    }
-  });
-
-  centerUserLocation = () => {
-    fromNullable(
-      document.querySelector<HTMLButtonElement>(
-        ".mapboxgl-ctrl-geolocate:not(.mapboxgl-ctrl-geolocate-active)"
-      )
-    ).map(el => el.click());
-  };
-
   initializeMap() {
     (mapboxgl as any).accessToken =
       "pk.eyJ1IjoiZnJhbmNlc2NvY2lvcmlhIiwiYSI6ImNqcThyejR6ODA2ZDk0M25rZzZjcGo4ZmcifQ.yRWHQbG1dJjDp43d01bBOw";
@@ -104,10 +83,6 @@ class Map extends React.PureComponent<Props> {
 
       this.addLayers();
       this.addMarkers();
-
-      if (this.props.startPosition === "userLocation") {
-        this.centerUserLocation();
-      }
 
       if (
         this.props.startPosition === "firstRoute" &&
@@ -291,13 +266,7 @@ class Map extends React.PureComponent<Props> {
   }
 
   render() {
-    return (
-      <View
-        grow
-        id="map"
-        className={cx({ isNavigating: this.props.navigating })}
-      />
-    );
+    return <View grow id="map" />;
   }
 }
 

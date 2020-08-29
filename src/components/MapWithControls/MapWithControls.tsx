@@ -30,7 +30,7 @@ type Props = Omit<MapProps, "navigating"> & {
 
 type State = {
   position: Option<Position>;
-  deviceOrientation: Option<number>;
+  deviceBearing: Option<number>;
   showElevationProfile: boolean;
   geoLocationState:
     | "Off"
@@ -52,9 +52,9 @@ class MapWithControls extends React.Component<Props, State> {
 
   state: State = {
     position: none,
-    deviceOrientation: none,
+    deviceBearing: none,
     showElevationProfile: false,
-    geoLocationState: "Off"
+    geoLocationState: "CompassTracking"
   };
 
   componentDidMount() {
@@ -63,22 +63,21 @@ class MapWithControls extends React.Component<Props, State> {
     }
 
     this.positionWatch = some(
-      navigator.geolocation.watchPosition(position => {
-        localStorage.setItem("start_lat", String(position.coords.latitude));
-        localStorage.setItem("start_lng", String(position.coords.longitude));
+      navigator.geolocation.watchPosition(
+        position => {
+          localStorage.setItem("start_lat", String(position.coords.latitude));
+          localStorage.setItem("start_lng", String(position.coords.longitude));
 
-        this.setState(
-          {
-            position: some(position)
-          },
-          this.updateUserLocationDot
-        );
-      })
+          this.setState({ position: some(position) });
+        },
+        () => {},
+        { enableHighAccuracy: true }
+      )
     );
 
     if (this.props.navigatingRoute.isSome())
       window.addEventListener(
-        "deviceorientation",
+        "deviceorientationabsolute",
         this.onDeviceOrientation,
         true
       );
@@ -92,7 +91,7 @@ class MapWithControls extends React.Component<Props, State> {
     );
 
     window.removeEventListener(
-      "deviceorientation",
+      "deviceorientationabsolute",
       this.onDeviceOrientation,
       true
     );
@@ -174,27 +173,29 @@ class MapWithControls extends React.Component<Props, State> {
       map.on("dragend", () => {
         this.props.onSortRoutes && this.props.onSortRoutes();
       });
+    }
+  };
 
-      map.on("rotate", () => {
-        const transformRotation = this.map.fold(
-          "rotate(0deg)",
-          map => `rotate(-${map.getBearing()}deg)`
-        );
-
-        if (this.compassIcon.current) {
-          this.compassIcon.current.style.transform = transformRotation;
-        }
-
+  rotateUserLocationDot = () => {
+    this.map.map(map => {
+      this.state.deviceBearing.map(bearing => {
         fromNullable(document.getElementById("userLocationDotWrapper")).map(
           htmlElement => {
+            const degree =
+              this.state.geoLocationState === "CompassTracking"
+                ? 0
+                : bearing - map.getBearing();
+
+            const transformRotation = `rotate(${degree}deg)`;
+
             htmlElement.style.transform = transformRotation;
           }
         );
       });
-    }
+    });
   };
 
-  updateUserLocationDot = () => {
+  updateUserLocationDotMarker = () => {
     this.map.map(map => {
       this.state.position.map(position => {
         const lngLat: mapboxgl.LngLatLike = {
@@ -284,15 +285,16 @@ class MapWithControls extends React.Component<Props, State> {
   };
 
   onDeviceOrientation = throttle((e: DeviceOrientationEvent) => {
-    if (this.state.geoLocationState === "CompassTracking") {
-      this.setState({
-        deviceOrientation: fromNullable(e.alpha)
-      });
-    }
+    this.setState(
+      {
+        deviceBearing: fromNullable(e.alpha).map(alpha => -alpha) // bearing is the opposite of alpha
+      },
+      this.rotateUserLocationDot
+    );
   }, 16);
 
   componentDidUpdate(_: unknown, prevState: State) {
-    this.updateUserLocationDot();
+    this.updateUserLocationDotMarker();
 
     if (!this.interacting && this.state.geoLocationState === "NorthTracking") {
       this.centerOnUserLocation({
@@ -306,7 +308,7 @@ class MapWithControls extends React.Component<Props, State> {
       this.state.geoLocationState === "CompassTracking"
     ) {
       this.centerOnUserLocation({
-        bearing: this.state.deviceOrientation.fold(0, identity),
+        bearing: this.state.deviceBearing.fold(0, identity),
         animate: prevState.geoLocationState !== "CompassTracking"
       });
     }
