@@ -103,44 +103,44 @@ class MapWithControls extends React.Component<Props, State> {
     );
   }
 
+  getCoordinatesSubset = (
+    coordinates: Route["geometry"]["coordinates"]
+  ): Route["geometry"]["coordinates"] => {
+    const hPixels = window.innerWidth * window.devicePixelRatio;
+    const steps = hPixels / 5;
+
+    return coordinates.filter(
+      (_, i) => i % Math.max(1, Math.round(coordinates.length / steps)) === 0
+    );
+  };
+
   getClosestRoutePoint = (
     position: Position
   ): Option<{ distance: number; index: number }> => {
     return this.props.navigatingRoute.map(route => {
-      const hPixels = window.innerWidth * window.devicePixelRatio;
-      const steps = hPixels / 5;
+      const closestRoutePoint = this.getCoordinatesSubset(
+        route.geometry.coordinates
+      ).reduce(
+        (acc, coordinates, index) => {
+          const userLat = coordinates[1];
+          const userLng = coordinates[0];
 
-      const closestRoutePoint = route.geometry.coordinates
-        .filter(
-          (_, i) =>
-            i %
-              Math.max(
-                1,
-                Math.round(route.geometry.coordinates.length / steps)
-              ) ===
-            0
-        )
-        .reduce(
-          (acc, coordinates, index) => {
-            const userLat = coordinates[1];
-            const userLng = coordinates[0];
+          const ruler = new CheapRuler(userLat, "meters");
 
-            const ruler = new CheapRuler(userLat, "meters");
+          const distance = ruler.distance(
+            [userLat, userLng],
+            [position.coords.latitude, position.coords.longitude]
+          );
 
-            const distance = ruler.distance(
-              [userLat, userLng],
-              [position.coords.latitude, position.coords.longitude]
-            );
-
-            return distance < 200 && distance < acc.distance
-              ? { distance, index, coordinates }
-              : acc;
-          },
-          {
-            distance: Infinity,
-            index: -1
-          }
-        );
+          return distance < 200 && distance < acc.distance
+            ? { distance, index, coordinates }
+            : acc;
+        },
+        {
+          distance: Infinity,
+          index: -1
+        }
+      );
 
       return closestRoutePoint;
     });
