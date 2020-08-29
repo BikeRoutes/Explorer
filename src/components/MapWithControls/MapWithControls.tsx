@@ -54,7 +54,7 @@ class MapWithControls extends React.Component<Props, State> {
     position: none,
     deviceBearing: none,
     showElevationProfile: false,
-    geoLocationState: "CompassTracking"
+    geoLocationState: "Off"
   };
 
   componentDidMount() {
