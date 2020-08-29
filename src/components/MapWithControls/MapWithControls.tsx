@@ -50,6 +50,11 @@ class MapWithControls extends React.Component<Props, State> {
 
   userLocationMarker: Option<mapboxgl.Marker> = none;
 
+  previousClosestRoutePoint: Option<{
+    distance: number;
+    index: number;
+  }> = none;
+
   state: State = {
     position: none,
     deviceBearing: none,
@@ -114,36 +119,43 @@ class MapWithControls extends React.Component<Props, State> {
     );
   };
 
-  getClosestRoutePoint = (
-    position: Position
-  ): Option<{ distance: number; index: number }> => {
-    return this.props.navigatingRoute.map(route => {
-      const closestRoutePoint = this.getCoordinatesSubset(
-        route.geometry.coordinates
-      ).reduce(
-        (acc, coordinates, index) => {
-          const userLat = coordinates[1];
-          const userLng = coordinates[0];
+  getClosestRoutePoint = (): Option<{ distance: number; index: number }> => {
+    if (this.interacting) {
+      return this.previousClosestRoutePoint;
+    }
 
-          const ruler = new CheapRuler(userLat, "meters");
+    return this.state.position.chain(position =>
+      this.props.navigatingRoute.chain(route => {
+        const closestRoutePoint = this.getCoordinatesSubset(
+          route.geometry.coordinates
+        ).reduce(
+          (acc, coordinates, index) => {
+            const userLat = coordinates[1];
+            const userLng = coordinates[0];
 
-          const distance = ruler.distance(
-            [userLat, userLng],
-            [position.coords.latitude, position.coords.longitude]
-          );
+            const ruler = new CheapRuler(userLat, "meters");
 
-          return distance < 200 && distance < acc.distance
-            ? { distance, index, coordinates }
-            : acc;
-        },
-        {
-          distance: Infinity,
-          index: -1
-        }
-      );
+            const distance = ruler.distance(
+              [userLat, userLng],
+              [position.coords.latitude, position.coords.longitude]
+            );
 
-      return closestRoutePoint;
-    });
+            return distance < 200 && distance < acc.distance
+              ? { distance, index, coordinates }
+              : acc;
+          },
+          {
+            distance: Infinity,
+            index: -1
+          }
+        );
+
+        this.previousClosestRoutePoint =
+          closestRoutePoint.index >= 0 ? some(closestRoutePoint) : none;
+
+        return this.previousClosestRoutePoint;
+      })
+    );
   };
 
   updateInnerRef = (map: mapboxgl.Map) => {
@@ -461,17 +473,10 @@ class MapWithControls extends React.Component<Props, State> {
           <View className="elevation-profile-wrapper">
             <ElevationProfile
               route={this.props.navigatingRoute.value}
-              activeRoutePointIndex={
-                !this.interacting
-                  ? this.state.position
-                      .chain(position =>
-                        this.getClosestRoutePoint(position).map(
-                          activeRoutePointIndex => activeRoutePointIndex.index
-                        )
-                      )
-                      .toUndefined()
-                  : undefined
-              }
+              activeRoutePointIndex={this.getClosestRoutePoint()
+                .map(activeRoutePointIndex => activeRoutePointIndex.index)
+
+                .toUndefined()}
             />
           </View>
         )}
