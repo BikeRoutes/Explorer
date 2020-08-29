@@ -10,6 +10,7 @@ import mapboxgl from "mapbox-gl";
 import { Route } from "../../model";
 import throttle from "lodash/throttle";
 import CheapRuler from "cheap-ruler";
+import { identity } from "fp-ts/lib/function";
 
 import "./mapWithControls.scss";
 
@@ -242,24 +243,26 @@ class MapWithControls extends React.Component<Props, State> {
     });
   };
 
-  centerOnUserLocation = (bearing: number) => {
+  centerOnUserLocation = (options: { bearing: number; animate: boolean }) => {
     this.map.map(map => {
       this.state.position.map(position => {
         const animationDurationMS = 1000;
 
         map.flyTo({
           duration: animationDurationMS,
-          animate: true,
           center: {
             lng: position.coords.longitude,
             lat: position.coords.latitude
           },
-          bearing
+          essential: true,
+          ...options
         });
 
-        // smooth animation
-        this.interacting = true;
-        setTimeout(() => (this.interacting = false), animationDurationMS);
+        if (options.animate) {
+          // smooth animation
+          this.interacting = true;
+          setTimeout(() => (this.interacting = false), animationDurationMS + 5);
+        }
       });
     });
   };
@@ -281,24 +284,31 @@ class MapWithControls extends React.Component<Props, State> {
   };
 
   onDeviceOrientation = throttle((e: DeviceOrientationEvent) => {
-    this.setState({
-      deviceOrientation: fromNullable(e.alpha)
-    });
-  }, 30);
+    if (this.state.geoLocationState === "CompassTracking") {
+      this.setState({
+        deviceOrientation: fromNullable(e.alpha)
+      });
+    }
+  }, 16);
 
-  componentDidUpdate() {
+  componentDidUpdate(_: unknown, prevState: State) {
     this.updateUserLocationDot();
 
     if (!this.interacting && this.state.geoLocationState === "NorthTracking") {
-      this.centerOnUserLocation(0);
+      this.centerOnUserLocation({
+        bearing: 0,
+        animate: prevState.geoLocationState !== "NorthTracking"
+      });
     }
 
     if (
       !this.interacting &&
-      this.state.geoLocationState === "CompassTracking" &&
-      this.state.deviceOrientation.isSome()
+      this.state.geoLocationState === "CompassTracking"
     ) {
-      this.centerOnUserLocation(this.state.deviceOrientation.value);
+      this.centerOnUserLocation({
+        bearing: this.state.deviceOrientation.fold(0, identity),
+        animate: prevState.geoLocationState !== "CompassTracking"
+      });
     }
   }
 
