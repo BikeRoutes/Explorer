@@ -6,11 +6,10 @@ import mapboxgl from "mapbox-gl";
 import Popup from "../Popup/Popup";
 import Marker from "../Marker/Marker";
 import View from "../View";
-import { Option, none, some, fromNullable } from "fp-ts/lib/Option";
+import { Option, none, some } from "fp-ts/lib/Option";
 import { Route } from "../../model";
 import mobileDetect from "@buildo/bento/utils/mobileDetect";
 import { identity } from "fp-ts/lib/function";
-import cx from "classnames";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.scss";

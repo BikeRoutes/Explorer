@@ -81,6 +81,10 @@ class MapWithControls extends React.Component<Props, State> {
         this.onDeviceOrientation,
         true
       );
+
+    if (this.props.startPosition === "userLocation") {
+      this.setState({ geoLocationState: "NorthTracking" });
+    }
   }
 
   componentWillUnmount() {
@@ -244,7 +248,11 @@ class MapWithControls extends React.Component<Props, State> {
     });
   };
 
-  centerOnUserLocation = (options: { bearing: number; animate: boolean }) => {
+  centerOnUserLocation = (options: {
+    bearing: number;
+    animate: boolean;
+    zoom?: number;
+  }) => {
     this.map.map(map => {
       this.state.position.map(position => {
         const animationDurationMS = 1000;
@@ -300,6 +308,11 @@ class MapWithControls extends React.Component<Props, State> {
       this.centerOnUserLocation({
         bearing: 0,
         animate: prevState.geoLocationState !== "NorthTracking"
+        // zoom:
+        //   prevState.geoLocationState === "Off" &&
+        //   this.props.navigatingRoute.isSome()
+        //     ? 15
+        //     : undefined
       });
     }
 
@@ -310,6 +323,11 @@ class MapWithControls extends React.Component<Props, State> {
       this.centerOnUserLocation({
         bearing: this.state.deviceBearing.fold(0, identity),
         animate: prevState.geoLocationState !== "CompassTracking"
+        // zoom:
+        //   prevState.geoLocationState === "Off" &&
+        //   this.props.navigatingRoute.isSome()
+        //     ? 15
+        //     : undefined
       });
     }
   }
