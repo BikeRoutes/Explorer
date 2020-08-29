@@ -50,20 +50,19 @@ export type Content = {
   html_url: string;
 };
 
+type Latitude = number;
+type Longitude = number;
+type Elevation = number;
+
 export type Geometry = {
   type: "LineString";
-  coordinates: Array<[number, number, number?]>;
+  coordinates: Array<[Longitude, Latitude, Elevation?]>;
 };
 
 export type GeoJSONFeature = {
   type: "Feature";
   properties: {
     name: string;
-    color: string;
-    length: number;
-    elevationGain: number;
-    minElevation: number;
-    maxElevation: number;
     url: string;
   };
   geometry: Geometry;
@@ -73,4 +72,18 @@ export type GeoJSONFeatureCollection = {
   features: GeoJSONFeature[];
 };
 
-export type Route = GeoJSONFeature & { id: string };
+type RouteProperties = {
+  name: string;
+  color: string;
+  length: number;
+  elevationGain: number;
+  minElevation: number;
+  maxElevation: number;
+  distances: number[];
+  url: string;
+};
+
+export type Route = Omit<GeoJSONFeature, "properties"> & {
+  id: string;
+  properties: RouteProperties;
+};

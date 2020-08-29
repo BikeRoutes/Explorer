@@ -35,6 +35,46 @@ export const currentView = Query({
   fetch: ({ location }) => Promise.resolve(locationToView(location))
 });
 
+const getRichFeature = (feature: GeoJSONFeature): Route => {
+  const minElevation = feature.geometry.coordinates.reduce(
+    (acc: number, c) => (c[2] && c[2] < acc ? c[2] : acc),
+    Number.MAX_SAFE_INTEGER
+  );
+
+  const maxElevation = feature.geometry.coordinates.reduce(
+    (acc: number, c) => (c[2] && c[2] > acc ? c[2] : acc),
+    Number.MIN_SAFE_INTEGER
+  );
+
+  const distances = feature.geometry.coordinates.map((_, i) => {
+    return (
+      geoJsonLength({
+        type: "LineString",
+        coordinates: feature.geometry.coordinates.slice(0, i + 1)
+      }) / 1000
+    );
+  });
+
+  const richFeature: Route = {
+    id: feature.properties.url,
+    ...feature,
+    properties: {
+      ...feature.properties,
+      color:
+        feature.properties.url !== "gpx"
+          ? stringToColor(feature.properties.name)
+          : "#38ffcc",
+      length: Math.round(geoJsonLength(feature.geometry) / 100) / 10,
+      elevationGain: Math.round(getElevationGain(feature.geometry.coordinates)),
+      minElevation,
+      maxElevation,
+      distances
+    }
+  };
+
+  return richFeature;
+};
+
 export const routes = Query({
   cacheStrategy: available,
   params: {},
@@ -43,36 +83,7 @@ export const routes = Query({
     fetch("https://or52hotxz1.execute-api.us-east-1.amazonaws.com/dev/")
       .then(res => res.json() as Promise<{ body: string }>)
       .then((res): GeoJSONFeature[] => JSON.parse(res.body))
-      .then(features =>
-        features.map(feature => {
-          const minElevation = feature.geometry.coordinates.reduce(
-            (acc: number, c) => (c[2] && c[2] < acc ? c[2] : acc),
-            Number.MAX_SAFE_INTEGER
-          );
-
-          const maxElevation = feature.geometry.coordinates.reduce(
-            (acc: number, c) => (c[2] && c[2] > acc ? c[2] : acc),
-            Number.MIN_SAFE_INTEGER
-          );
-
-          const richFeature: Route = {
-            id: feature.properties.url,
-            ...feature,
-            properties: {
-              ...feature.properties,
-              color: stringToColor(feature.properties.name),
-              length: Math.round(geoJsonLength(feature.geometry) / 100) / 10,
-              elevationGain: Math.round(
-                getElevationGain(feature.geometry.coordinates)
-              ),
-              minElevation,
-              maxElevation
-            }
-          };
-
-          return richFeature;
-        })
-      )
+      .then(features => features.map(getRichFeature))
 });
 
 export const route = Query({
@@ -99,7 +110,6 @@ export const route = Query({
               .reduce((acc, feature) => {
                 return {
                   ...acc,
-
                   geometry: {
                     ...acc.geometry,
                     coordinates: acc.geometry.coordinates.concat(
@@ -109,32 +119,13 @@ export const route = Query({
                 };
               });
 
-            const minElevation = geoJSONFeature.geometry.coordinates.reduce(
-              (acc: number, c) => (c[2] && c[2] < acc ? c[2] : acc),
-              Number.MAX_SAFE_INTEGER
-            );
-
-            const maxElevation = geoJSONFeature.geometry.coordinates.reduce(
-              (acc: number, c) => (c[2] && c[2] > acc ? c[2] : acc),
-              Number.MIN_SAFE_INTEGER
-            );
-
-            return {
+            return getRichFeature({
               ...geoJSONFeature,
               properties: {
                 ...geoJSONFeature.properties,
-                color: "#38ffcc",
-                length:
-                  Math.round(geoJsonLength(geoJSONFeature.geometry) / 100) / 10,
-                elevationGain: Math.round(
-                  getElevationGain(geoJSONFeature.geometry.coordinates)
-                ),
-                minElevation,
-                maxElevation,
                 url: "gpx"
-              },
-              id: "gpx"
-            };
+              }
+            });
           })
         );
       } else {

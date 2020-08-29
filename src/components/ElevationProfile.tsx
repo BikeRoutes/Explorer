@@ -2,7 +2,6 @@ import * as React from "react";
 import { Line, defaults } from "react-chartjs-2";
 import { Route } from "../model";
 import uniq from "lodash/uniq";
-import * as geoJsonLength from "geojson-length";
 import { Option, none } from "fp-ts/lib/Option";
 
 defaults.global.animation = 0;
@@ -31,13 +30,7 @@ export default class ElevationProfile extends React.Component<Props> {
       }
     };
 
-    const distances = this.props.route.geometry.coordinates.map(
-      (_, i) =>
-        geoJsonLength({
-          ...this.props.route.geometry,
-          coordinates: this.props.route.geometry.coordinates.slice(0, i + 1)
-        }) / 1000
-    );
+    const distances = this.props.route.properties.distances;
 
     const ticks = uniq(distances.map(d => round(d, scale)));
 
@@ -90,7 +83,7 @@ export default class ElevationProfile extends React.Component<Props> {
                 labels: ticks,
                 ticks: {
                   callback: (value: number) => {
-                    return value < this.props.route.properties.length
+                    return value <= this.props.route.properties.length
                       ? `${value} km`
                       : null;
                   }
