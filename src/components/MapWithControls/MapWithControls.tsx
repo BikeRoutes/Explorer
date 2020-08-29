@@ -80,12 +80,11 @@ class MapWithControls extends React.Component<Props, State> {
       )
     );
 
-    if (this.props.navigatingRoute.isSome())
-      window.addEventListener(
-        "deviceorientationabsolute",
-        this.onDeviceOrientation,
-        true
-      );
+    window.addEventListener(
+      "deviceorientationabsolute",
+      this.onDeviceOrientation,
+      true
+    );
 
     if (this.props.startPosition === "userLocation") {
       this.setState({ geoLocationState: "NorthTracking" });
