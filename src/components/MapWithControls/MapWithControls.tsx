@@ -88,7 +88,9 @@ class MapWithControls extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    noSleep.disable();
+    if (this.props.noSleep) {
+      noSleep.disable();
+    }
 
     this.positionWatch.map(positionWatch =>
       navigator.geolocation.clearWatch(positionWatch)
