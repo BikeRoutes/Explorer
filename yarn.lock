@@ -3986,6 +3986,11 @@ chartjs-color@^2.1.0:
     chartjs-color-string "^0.6.0"
     color-convert "^1.9.3"
 
+cheap-ruler@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/cheap-ruler/-/cheap-ruler-3.0.1.tgz#3df3bd6fe664d8cab9e9e826bba24d7271e7645a"
+  integrity sha512-bmBKGkNKcwCpltGzfMXZMrFE06SG8dgSv96W39Mk+um7zbNTQNumKl5LBwFC0gbffy8Jnf0+SDHsOqpDYJxYow==
+
 check-types@^8.0.3:
   version "8.0.3"
   resolved "https://registry.yarnpkg.com/check-types/-/check-types-8.0.3.tgz#3356cca19c889544f2d7a95ed49ce508a0ecf552"
