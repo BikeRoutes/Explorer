@@ -461,13 +461,17 @@ class MapWithControls extends React.Component<Props, State> {
           <View className="elevation-profile-wrapper">
             <ElevationProfile
               route={this.props.navigatingRoute.value}
-              activeRoutePointIndex={this.state.position
-                .chain(position =>
-                  this.getClosestRoutePoint(position).map(
-                    activeRoutePointIndex => activeRoutePointIndex.index
-                  )
-                )
-                .toUndefined()}
+              activeRoutePointIndex={
+                !this.interacting
+                  ? this.state.position
+                      .chain(position =>
+                        this.getClosestRoutePoint(position).map(
+                          activeRoutePointIndex => activeRoutePointIndex.index
+                        )
+                      )
+                      .toUndefined()
+                  : undefined
+              }
             />
           </View>
         )}
