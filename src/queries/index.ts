@@ -46,14 +46,19 @@ const getRichFeature = (feature: GeoJSONFeature): Route => {
     Number.MIN_SAFE_INTEGER
   );
 
-  const distances = feature.geometry.coordinates.map((_, i) => {
-    return (
-      geoJsonLength({
-        type: "LineString",
-        coordinates: feature.geometry.coordinates.slice(0, i + 1)
-      }) / 1000
-    );
-  });
+  const distances = feature.geometry.coordinates.reduce((acc, _, i) => {
+    if (i === 0) {
+      return acc.concat(0);
+    } else {
+      const distanceDiff =
+        geoJsonLength({
+          type: "LineString",
+          coordinates: feature.geometry.coordinates.slice(i - 1, i + 1)
+        }) / 1000;
+
+      return acc.concat(acc[i - 1] + distanceDiff);
+    }
+  }, [] as number[]);
 
   const richFeature: Route = {
     id: feature.properties.url,
