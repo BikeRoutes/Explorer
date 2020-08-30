@@ -306,26 +306,27 @@ class MapWithControls extends React.Component<Props, State> {
   };
 
   compassHeading(alpha: number, beta: number, gamma: number): number {
+    // https://stackoverflow.com/questions/18112729/calculate-compass-heading-from-deviceorientation-event-api
     // Convert degrees to radians
-    var alphaRad = alpha * (Math.PI / 180);
-    var betaRad = beta * (Math.PI / 180);
-    var gammaRad = gamma * (Math.PI / 180);
+    const alphaRad = alpha * (Math.PI / 180);
+    const betaRad = beta * (Math.PI / 180);
+    const gammaRad = gamma * (Math.PI / 180);
 
     // Calculate equation components
-    var cA = Math.cos(alphaRad);
-    var sA = Math.sin(alphaRad);
-    var cB = Math.cos(betaRad);
-    var sB = Math.sin(betaRad);
-    var cG = Math.cos(gammaRad);
-    var sG = Math.sin(gammaRad);
+    const cA = Math.cos(alphaRad);
+    const sA = Math.sin(alphaRad);
+    // const cB = Math.cos(betaRad);
+    const sB = Math.sin(betaRad);
+    const cG = Math.cos(gammaRad);
+    const sG = Math.sin(gammaRad);
 
     // Calculate A, B, C rotation components
-    var rA = -cA * sG - sA * sB * cG;
-    var rB = -sA * sG + cA * sB * cG;
-    var rC = -cB * cG;
+    const rA = -cA * sG - sA * sB * cG;
+    const rB = -sA * sG + cA * sB * cG;
+    // const rC = -cB * cG;
 
     // Calculate compass heading
-    var compassHeading = Math.atan(rA / rB);
+    let compassHeading = Math.atan(rA / rB);
 
     // Convert from half unit circle to whole unit circle
     if (rB < 0) {
