@@ -42,13 +42,14 @@ type State = {
 
 class MapWithControls extends React.Component<Props, State> {
   map: Option<mapboxgl.Map> = none;
+  userLocationMarker: Option<mapboxgl.Marker> = none;
+
   positionWatch: Option<number> = none;
+  positionWatchCheckInterval: Option<number> = none;
 
   compassIcon: React.RefObject<SVGSVGElement> = React.createRef();
 
   interacting: boolean = false;
-
-  userLocationMarker: Option<mapboxgl.Marker> = none;
 
   previousClosestRoutePoint: Option<{
     distance: number;
@@ -59,14 +60,11 @@ class MapWithControls extends React.Component<Props, State> {
     position: none,
     deviceBearing: none,
     showElevationProfile: false,
-    geoLocationState: "Off"
+    geoLocationState:
+      this.props.startPosition === "userLocation" ? "NorthTracking" : "Off"
   };
 
-  componentDidMount() {
-    if (this.props.noSleep) {
-      noSleep.enable();
-    }
-
+  startWatchingPosition = () => {
     this.positionWatch = some(
       navigator.geolocation.watchPosition(
         position => {
@@ -76,19 +74,72 @@ class MapWithControls extends React.Component<Props, State> {
           this.setState({ position: some(position) });
         },
         () => {},
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: false }
       )
     );
 
+    this.positionWatchCheckInterval = some(
+      window.setInterval(() => {
+        this.state.position.map(position => {
+          // no update for > 15s
+          if (Date.now() - position.timestamp > 60000) {
+            this.stopWatchingPosition();
+            this.startWatchingPosition();
+          }
+        });
+      }, 30000)
+    );
+  };
+
+  stopWatchingPosition = () => {
+    this.positionWatch.map(positionWatch =>
+      navigator.geolocation.clearWatch(positionWatch)
+    );
+
+    this.positionWatchCheckInterval.map(positionWatchCheckInterval => {
+      window.clearInterval(positionWatchCheckInterval);
+    });
+  };
+
+  startWatchingDeviceOrientation = () => {
     window.addEventListener(
       "deviceorientationabsolute",
       this.onDeviceOrientation,
       true
     );
+  };
 
-    if (this.props.startPosition === "userLocation") {
-      this.setState({ geoLocationState: "NorthTracking" });
+  stopWatchingDeviceOrientation = () => {
+    window.removeEventListener(
+      "deviceorientationabsolute",
+      this.onDeviceOrientation,
+      true
+    );
+  };
+
+  onVisibilityChange = () => {
+    if (document.hidden) {
+      this.stopWatchingDeviceOrientation();
+      this.stopWatchingPosition();
+    } else {
+      this.startWatchingDeviceOrientation();
+      if (this.state.geoLocationState !== "Off") {
+        this.startWatchingPosition();
+      }
     }
+  };
+
+  componentDidMount() {
+    if (this.props.noSleep) {
+      noSleep.enable();
+    }
+
+    this.startWatchingDeviceOrientation();
+    if (this.state.geoLocationState !== "Off") {
+      this.startWatchingPosition();
+    }
+
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
   }
 
   componentWillUnmount() {
@@ -96,15 +147,10 @@ class MapWithControls extends React.Component<Props, State> {
       noSleep.disable();
     }
 
-    this.positionWatch.map(positionWatch =>
-      navigator.geolocation.clearWatch(positionWatch)
-    );
+    this.stopWatchingDeviceOrientation();
+    this.stopWatchingPosition();
 
-    window.removeEventListener(
-      "deviceorientationabsolute",
-      this.onDeviceOrientation,
-      true
-    );
+    document.removeEventListener("visibilitychange", this.onVisibilityChange);
   }
 
   getCoordinatesSubset = (
@@ -357,8 +403,26 @@ class MapWithControls extends React.Component<Props, State> {
   }, 16);
 
   componentDidUpdate(_: unknown, prevState: State) {
+    // start watching position
+    if (
+      prevState.geoLocationState === "Off" &&
+      this.state.geoLocationState !== "Off"
+    ) {
+      this.startWatchingPosition();
+    }
+
+    // stop watching position
+    if (
+      prevState.geoLocationState !== "Off" &&
+      this.state.geoLocationState === "Off"
+    ) {
+      this.stopWatchingPosition();
+    }
+
+    // add, remove or update the position of the user location "dot" marker
     this.updateUserLocationDotMarker();
 
+    // center the map on user position and point North
     if (!this.interacting && this.state.geoLocationState === "NorthTracking") {
       this.centerOnUserLocation({
         bearing: 0,
@@ -371,6 +435,7 @@ class MapWithControls extends React.Component<Props, State> {
       });
     }
 
+    // center the map on user position and point to the device "heading"
     if (
       !this.interacting &&
       this.state.geoLocationState === "CompassTracking"
