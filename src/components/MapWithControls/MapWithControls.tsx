@@ -74,7 +74,7 @@ class MapWithControls extends React.Component<Props, State> {
           this.setState({ position: some(position) });
         },
         () => {},
-        { enableHighAccuracy: false }
+        { enableHighAccuracy: true }
       )
     );
 
