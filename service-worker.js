@@ -1,4 +1,4 @@
-importScripts("/Explorer/precache-manifest.cff76a6b865d07d66671f0ec24011415.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/Explorer/precache-manifest.7cbf441bd9645b3b470ff16695578164.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 /** copy-pasted from original sw **/
 self.addEventListener("message", event => {
@@ -36,23 +36,46 @@ this.addEventListener("activate", event => {
 });
 
 this.addEventListener("fetch", event => {
-  // return any GET request "cache-first"
-  event.respondWith(
-    caches.match(event.request).then(resp => {
-      const newRequest = fetch(event.request).then(response => {
-        if (event.request.method === "GET") {
-          const cacheResponse = response.clone();
-
-          caches.open("requests").then(cache => {
-            cache.put(event.request, cacheResponse);
-          });
+  if (event.request.url.includes("&cache-only=true")) {
+    // return GET requests "cache-only": fetch only if cached request is missing
+    event.respondWith(
+      caches.match(event.request).then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
 
-        return response;
-      });
+        return caches.open("requests").then(cache => {
+          return fetch(event.request).then(response => {
+            if (event.request.method === "GET") {
+              // Put a copy of the response in the runtime cache.
+              return cache.put(event.request, response.clone()).then(() => {
+                return response;
+              });
+            } else {
+              return response;
+            }
+          });
+        });
+      })
+    );
+  } else {
+    // return GET requests "cache-first"
+    event.respondWith(
+      caches.match(event.request).then(cachedResponse => {
+        const newRequest = fetch(event.request).then(response => {
+          if (event.request.method === "GET") {
+            // update cached response for next time
+            return caches.open("requests").then(cache => {
+              return cache.put(event.request, response.clone()).then(() => {
+                return response;
+              });
+            });
+          }
+        });
 
-      return resp || newRequest;
-    })
-  );
+        return cachedResponse || newRequest;
+      })
+    );
+  }
 });
 
