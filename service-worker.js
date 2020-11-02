@@ -59,22 +59,38 @@ this.addEventListener("fetch", event => {
       })
     );
   } else {
+    const isMapboxTileRequest =
+      event.request.url.includes("api.mapbox.com") &&
+      event.request.url.includes("vector.pbf");
+
     // return GET requests "cache-first"
     event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        const newRequest = fetch(event.request).then(response => {
-          if (event.request.method === "GET") {
-            // update cached response for next time
-            return caches.open("requests").then(cache => {
-              return cache.put(event.request, response.clone()).then(() => {
-                return response;
-              });
-            });
-          }
-        });
+      caches
+        .match(
+          event.request,
+          isMapboxTileRequest
+            ? {
+                ignoreSearch: true,
+                ignoreVary: true
+              }
+            : undefined
+        )
+        .then(cachedResponse => {
+          const newRequest = fetch(event.request).then(response => {
+            if (event.request.method === "GET") {
+              // update cached response for next time
+              return caches.open("requests").then(cache => {
+                cache.addAll();
 
-        return cachedResponse || newRequest;
-      })
+                return cache.put(url, response.clone()).then(() => {
+                  return response;
+                });
+              });
+            }
+          });
+
+          return cachedResponse || newRequest;
+        })
     );
   }
 });
