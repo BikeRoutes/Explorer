@@ -80,8 +80,6 @@ this.addEventListener("fetch", event => {
             if (event.request.method === "GET") {
               // update cached response for next time
               return caches.open("requests").then(cache => {
-                cache.addAll();
-
                 return cache.put(url, response.clone()).then(() => {
                   return response;
                 });
