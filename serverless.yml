@@ -4,6 +4,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   memorySize: 128
+  timeout: 30
   profile: AWS-LAMBDA
 
 functions:
