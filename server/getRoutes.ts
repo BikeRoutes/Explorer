@@ -11,16 +11,16 @@ const getGeoJSONsEntries = (acc: {
   path: string;
   entries: ContentEntry[];
 }): Array<BlobEntry & { path: string }> => {
-  if (acc.entries.every((e) => e.type === "blob")) {
+  if (acc.entries.every(e => e.type === "blob")) {
     return acc.entries
-      .filter((e) => e.name.includes(".geojson"))
-      .map((e) => ({ ...e, path: `${acc.path}/${e.name}` })) as Array<
+      .filter(e => e.name.includes(".geojson"))
+      .map(e => ({ ...e, path: `${acc.path}/${e.name}` })) as Array<
       BlobEntry & { path: string }
     >;
   } else {
     return flatten(
       catOptions(
-        acc.entries.map((parentEntry) =>
+        acc.entries.map(parentEntry =>
           parentEntry.type === "tree"
             ? some(
                 getGeoJSONsEntries({
@@ -52,7 +52,7 @@ function getGeoJSONs(contents: Contents): TaskEither<string, GeoJSONFeature[]> {
     entries: (contents.repository.object.entries as any) as ContentEntry[]
   });
 
-  return traverseTaskEither(geoJSONsEntries, (entry) => {
+  return traverseTaskEither(geoJSONsEntries, entry => {
     const url = `https://github.com/BikeRoutes/BikeRoutes/blob/master${entry.path}`;
 
     if (!entry.object.isTruncated) {
@@ -68,8 +68,8 @@ function getGeoJSONs(contents: Contents): TaskEither<string, GeoJSONFeature[]> {
           fetch(
             `https://raw.githubusercontent.com/BikeRoutes/BikeRoutes/master${entry.path}`
           )
-            .then((res) => res.json() as Promise<GeoJSONFeatureCollection>)
-            .then((featureCollection) =>
+            .then(res => res.json() as Promise<GeoJSONFeatureCollection>)
+            .then(featureCollection =>
               geoJSONFeatureFromGeoJSONFeatureCollection(featureCollection, url)
             ),
         () => `Raw githubusercontent response error for entry "${entry.path}"`
@@ -81,7 +81,7 @@ function getGeoJSONs(contents: Contents): TaskEither<string, GeoJSONFeature[]> {
 export const getRoutes = (): Promise<GeoJSONFeature[]> => {
   return query(contents, {}, Contents)
     .chain(getGeoJSONs)
-    .fold((e) => {
+    .fold(e => {
       console.log(e);
       return [];
     }, t.identity)

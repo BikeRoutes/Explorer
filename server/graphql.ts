@@ -21,11 +21,11 @@ export const query = <A>(
       `Github graphql API response error for query "${query
         .split("\n")[1]
         .trim()} ... }":\n${JSON.stringify(e.message)}`
-  ).chain((res) => {
+  ).chain(res => {
     return taskEither
       .fromEither(responseType.decode(res))
       .mapLeft(
-        (errors) =>
+        errors =>
           `Error while validating response type:\n${failure(errors).join("\n")}`
       );
   });
@@ -76,6 +76,7 @@ export const contents = `
   rateLimit {
     cost
     limit
+    remaining
   }
 }
 `;
@@ -158,6 +159,11 @@ export const Contents = t.type({
         ])
       )
     })
+  }),
+  rateLimit: t.type({
+    cost: t.number,
+    limit: t.number,
+    remaining: t.number
   })
 });
 
