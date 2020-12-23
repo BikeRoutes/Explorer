@@ -21,7 +21,7 @@ const { linkify } = require("remarkable/linkify");
 
 const togpx = require("togpx");
 
-const Remarkable = (RemarkableModule as any).Remarkable as RemarkableModule;
+const { Remarkable } = RemarkableModule;
 
 const saveGPX = (route: Route): void => {
   const blob = new Blob([togpx(route)], {
@@ -120,7 +120,7 @@ class Markdown extends React.PureComponent<{
   }
 }
 
-const md = new (Remarkable as any)().use(linkify);
+const md = new Remarkable().use(linkify);
 
 const queries = declareQueries({ route, routeReadme });
 const commands = declareCommands({ doUpdateLocation });

@@ -25,7 +25,6 @@
     "@types/qs": "^6.9.1",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
-    "@types/remarkable": "^1.7.4",
     "chart.js": "^2.9.3",
     "cheap-ruler": "^3.0.1",
     "classnames": "^2.2.6",
