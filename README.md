@@ -1,8 +1,8 @@
 # Explorer
 
-Web application to explore the routes hosted on https://bikeroutes.github.io/BikeRoutes/ with an interactive map
+Web application to explore the routes hosted on https://github.com/BikeRoutes/BikeRoutes with an interactive map
 
-https://bikeroutes.github.io/Explorer/
+https://bikeroutes.it/
 
 ## Web Development
 

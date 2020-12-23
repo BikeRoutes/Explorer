@@ -61,7 +61,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "homepage": "https://bikeroutes.github.io/Explorer",
+  "homepage": "https://bikeroutes.it",
   "browserslist": {
     "production": [
       ">0.2%",
