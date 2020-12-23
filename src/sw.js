@@ -78,9 +78,11 @@ this.addEventListener("fetch", event => {
             if (event.request.method === "GET") {
               // update cached response for next time
               return caches.open("requests").then(cache => {
-                return cache.put(url, response.clone()).then(() => {
-                  return response;
-                });
+                return cache
+                  .put(event.request.url, response.clone())
+                  .then(() => {
+                    return response;
+                  });
               });
             }
           });
