@@ -16,7 +16,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 workbox.routing.registerNavigationRoute(
-  workbox.precaching.getCacheKeyForURL("/index.html"),
+  workbox.precaching.getCacheKeyForURL("/Explorer/index.html"),
   {
     blacklist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
   }
