@@ -85,7 +85,7 @@ export const routes = Query({
   params: {},
   fetch: (): Promise<Route[]> =>
     // fetch("http://localhost:8081/")
-    fetch("https://or52hotxz1.execute-api.us-east-1.amazonaws.com/dev/")
+    fetch("https://vqzsf8gvnb.execute-api.eu-south-1.amazonaws.com/dev/")
       .then(res => res.json() as Promise<{ body: string }>)
       .then((res): GeoJSONFeature[] => JSON.parse(res.body))
       .then(features => features.map(getRichFeature))
