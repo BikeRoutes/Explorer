@@ -2,7 +2,8 @@ service: bikeroutes
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  region: eu-south-1
+  runtime: nodejs14.x
   memorySize: 128
   timeout: 30
   profile: AWS-LAMBDA
@@ -14,5 +15,4 @@ functions:
       - http:
           path: /
           method: get
-          integration: lambda
           cors: true
