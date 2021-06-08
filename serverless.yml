@@ -15,4 +15,6 @@ functions:
       - http:
           path: /
           method: get
-          cors: true
+          cors:
+            origin:
+              - https://bikeroutes.it
