@@ -1,19 +1,21 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import cx from "classnames";
+import { Marker } from "mapbox-gl";
 import View from "../View";
 import Map, { Props as MapProps } from "../Map/Map";
 import { none, some, Option, fromNullable } from "fp-ts/lib/Option";
 import NoSleep from "nosleep.js";
 import ElevationProfile from "../ElevationProfile";
-import mapboxgl from "mapbox-gl";
 import { Route } from "../../model";
 import throttle from "lodash/throttle";
 import CheapRuler from "cheap-ruler";
 import { identity } from "fp-ts/lib/function";
+import DrinkingWaterMarker from "../DrinkingWaterMarker";
 
 import "./mapWithControls.scss";
-import DrinkingWaterMarker from "../DrinkingWaterMarker";
+
+const mapboxgl = require("mapbox-gl/dist/mapbox-gl-csp");
 
 /* eslint-disable array-callback-return */
 
@@ -286,7 +288,7 @@ class MapWithControls extends React.Component<Props, State> {
             element
           );
 
-          const marker: mapboxgl.Marker = new mapboxgl.Marker({
+          const marker: Marker = new mapboxgl.Marker({
             element
           }).setLngLat(lngLat);
 

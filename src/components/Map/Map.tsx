@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import * as ReactDOM from "react-dom";
 import throttle from "lodash/throttle";
-import mapboxgl from "mapbox-gl";
+import { Map, MapMouseEvent, AnyLayer } from "mapbox-gl";
 import Popup from "../Popup/Popup";
 import Marker from "../Marker/Marker";
 import View from "../View";
@@ -15,6 +15,10 @@ import DrinkingWaterMarker from "../DrinkingWaterMarker";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./map.scss";
+
+const mapboxgl = require("mapbox-gl/dist/mapbox-gl-csp");
+
+mapboxgl.workerClass = require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
 
 /* eslint-disable array-callback-return */
 
@@ -30,7 +34,7 @@ const popupSettings: mapboxgl.PopupOptions = {
 export const getRouteDistanceInPixels = (
   route: Route,
   lngLat: { lng: number; lat: number },
-  map: mapboxgl.Map
+  map: Map
 ): number => {
   return route.geometry.coordinates.reduce((acc, coordinates) => {
     const point = map.project(new mapboxgl.LngLat(lngLat.lng, lngLat.lat));
@@ -51,15 +55,15 @@ export type Props = {
   hoveredRoute: Option<Route>;
   onRouteHover?: (route: Option<Route>) => void;
   onRouteSelect?: (route: Route) => void;
-  innerRef?: (map: mapboxgl.Map) => void;
+  innerRef?: (map: Map) => void;
   onSortRoutes?: () => void;
   startPosition: "userLocation" | "firstRoute";
   navigating: boolean;
   showDrinkingWater: boolean;
 };
 
-class Map extends React.PureComponent<Props> {
-  map: Option<mapboxgl.Map> = none;
+class _Map extends React.PureComponent<Props> {
+  map: Option<Map> = none;
   popupSelectedRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   popupHoveredRoute: mapboxgl.Popup = new mapboxgl.Popup(popupSettings);
   positionWatch: Option<number> = none;
@@ -134,7 +138,7 @@ class Map extends React.PureComponent<Props> {
   addLayers() {
     this.map.map(map => {
       this.props.routes.forEach(route => {
-        const layer: mapboxgl.Layer = {
+        const layer: AnyLayer = {
           id: route.properties.url,
           type: "line",
           source: {
@@ -205,7 +209,7 @@ class Map extends React.PureComponent<Props> {
     });
   };
 
-  onMouseMove = throttle((e: mapboxgl.MapMouseEvent) => {
+  onMouseMove = throttle((e: MapMouseEvent) => {
     type ClosestRoute = {
       distance: number;
       route: Route;
@@ -321,4 +325,4 @@ class Map extends React.PureComponent<Props> {
   }
 }
 
-export default Map;
+export default _Map;

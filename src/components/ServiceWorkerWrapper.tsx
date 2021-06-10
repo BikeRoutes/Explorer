@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from "react";
-import * as serviceWorker from "../serviceWorker";
+import * as serviceWorker from "../serviceWorkerRegistration";
 import View from "./View";
 import { none, Option, fromNullable } from "fp-ts/lib/Option";
 
