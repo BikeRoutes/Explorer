@@ -5,8 +5,11 @@ import View from "../View";
 import Explorer from "../Explorer/Explorer";
 import Details from "../Details/Details";
 import Navigation from "../Navigation/Navigation";
-import mapboxgl from "mapbox-gl";
 import ServiceWorkerWrapper from "../ServiceWorkerWrapper";
+
+const mapboxgl = require("mapbox-gl/dist/mapbox-gl-csp");
+
+mapboxgl.workerClass = require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
 
 mapboxgl.prewarm();
 

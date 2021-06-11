@@ -18,8 +18,6 @@ import "./map.scss";
 
 const mapboxgl = require("mapbox-gl/dist/mapbox-gl-csp");
 
-mapboxgl.workerClass = require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
-
 /* eslint-disable array-callback-return */
 
 const md = mobileDetect();

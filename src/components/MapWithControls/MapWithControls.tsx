@@ -33,7 +33,7 @@ type Props = Omit<MapProps, "navigating" | "showDrinkingWater"> & {
 };
 
 type State = {
-  position: Option<Position>;
+  position: Option<GeolocationPosition>;
   deviceBearing: Option<number>;
   showElevationProfile: boolean;
   showDrinkingWater: boolean;

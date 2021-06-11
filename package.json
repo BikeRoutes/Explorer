@@ -47,7 +47,7 @@
     "string-to-color": "^2.1.3",
     "togpx": "^0.5.4",
     "ts-node": "^8.8.1",
-    "typescript": "~3.7.2",
+    "typescript": "~4.3.2",
     "workbox-background-sync": "^5.1.3",
     "workbox-broadcast-update": "^5.1.3",
     "workbox-cacheable-response": "^5.1.3",
