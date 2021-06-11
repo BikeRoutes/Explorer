@@ -101,7 +101,10 @@ registerRoute(
 
 registerRoute(
   ({ url }) => {
-    return url.origin.includes("amazonaws.com");
+    return (
+      url.origin.includes("amazonaws.com") ||
+      url.origin.includes("raw.githubusercontent.com")
+    );
   },
   new StaleWhileRevalidate({
     cacheName: "github-routes",
