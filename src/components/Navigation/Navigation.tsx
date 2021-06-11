@@ -14,8 +14,6 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const md = mobileDetect();
 
-type x = typeof none;
-
 const queries = declareQueries({ route });
 const commands = declareCommands({ doUpdateLocation });
 

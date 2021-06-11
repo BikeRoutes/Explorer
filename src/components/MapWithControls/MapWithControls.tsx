@@ -657,8 +657,7 @@ class MapWithControls extends React.Component<Props, State> {
             <ElevationProfile
               route={this.props.navigatingRoute.value}
               activeRoutePointIndex={this.getClosestRoutePoint()
-                .map(activeRoutePointIndex => activeRoutePointIndex.index)
-
+                .map(activeRoutePointIndex => activeRoutePointIndex.index * 2)
                 .toUndefined()}
             />
           </View>
