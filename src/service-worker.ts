@@ -99,6 +99,20 @@ registerRoute(
   })
 );
 
+registerRoute(
+  ({ url }) => {
+    return url.origin.includes("amazonaws.com");
+  },
+  new StaleWhileRevalidate({
+    cacheName: "github-routes",
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200]
+      })
+    ]
+  })
+);
+
 self.addEventListener("fetch", event => {
   // return GET requests "cache-first"
   event.respondWith(
