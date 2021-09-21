@@ -95,11 +95,7 @@ registerRoute(
       new CacheableResponsePlugin({
         statuses: [0, 200]
       })
-    ],
-    matchOptions: {
-      ignoreSearch: true,
-      ignoreVary: true
-    }
+    ]
   })
 );
 

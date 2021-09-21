@@ -16,7 +16,7 @@ export default async (options: {
   `;
 
   return fetch(
-    `https://overpass-api.de/api/interpreter?data=${formData}&output&cache-only=true`
+    `https://overpass-api.de/api/interpreter?data=${formData}&output`
   )
     .then((res): Promise<{ elements: DrinkingWaterNode[] }> => res.json())
     .then(res => res.elements);
