@@ -109,7 +109,7 @@ class MapWithControls extends React.Component<Props, State> {
 
   startWatchingDeviceOrientation = () => {
     window.addEventListener(
-      "deviceorientationabsolute",
+      "deviceorientationabsolute" as any,
       this.onDeviceOrientation,
       true
     );
@@ -117,7 +117,7 @@ class MapWithControls extends React.Component<Props, State> {
 
   stopWatchingDeviceOrientation = () => {
     window.removeEventListener(
-      "deviceorientationabsolute",
+      "deviceorientationabsolute" as any,
       this.onDeviceOrientation,
       true
     );
